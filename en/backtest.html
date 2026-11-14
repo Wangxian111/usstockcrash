@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historical Backtest · US Stock Crash Radar</title>
+<meta name="description" content="2017–2026 US equity drawdown backtest: 6 computable signals, rolling 3-year percentiles, warning performance across five ≥10% drawdowns. Demo and educational use only, not investment advice.">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="alternate" hreflang="en" href="https://wangxian111.github.io/usstockcrash/en/backtest.html">
+<link rel="alternate" hreflang="zh-CN" href="https://wangxian111.github.io/usstockcrash/backtest.html">
+<link rel="alternate" hreflang="x-default" href="https://wangxian111.github.io/usstockcrash/backtest.html">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  .bt-episodes { min-width: 980px; }
+  .bt-sharp { min-width: 760px; }
+  .bt-fp { min-width: 720px; }
+  .bt-note { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; }
+  .bt-note b { color: var(--ink); }
+  .bt-method-list { margin: 0; padding-left: 1.2em; color: var(--ink-2); font-size: 12.5px; line-height: 1.85; }
+  .bt-method-list li { margin-bottom: 4px; }
+  /* Donation button styling — kept ready for when a Ko-fi / GitHub Sponsors account exists. */
+  .sponsor-btn { border-color: #ea4aaa; color: #ea4aaa; }
+  .sponsor-btn:hover { background: #ea4aaa; color: #fff !important; border-color: #ea4aaa !important; }
+  .lang-switch { font-size: 12.5px; color: var(--muted); text-decoration: none; }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>Historical Backtest <span class="mast-tag">2017–2026</span></h1>
+      <div class="sub">6 computable signals · rolling 3-year percentiles · data through <span id="btAsOf">—</span> · not investment advice</div>
+    </div>
+    <div class="mast-right">
+      <a class="ghost-btn" href="index.html" style="text-decoration:none">← Radar home</a>
+      <button class="ghost-btn" id="themeBtn" type="button">Theme: Auto</button>
+      <a class="lang-switch" href="../backtest.html" hreflang="zh-CN">中文</a>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="Page navigation">
+    <a href="#bt-summary">Conclusion</a>
+    <a href="#bt-score">Score History</a>
+    <a href="#bt-episodes">Episodes</a>
+    <a href="#bt-coverage">Signal Coverage</a>
+    <a href="#bt-fp">False Positives</a>
+    <a href="#bt-method">Method</a>
+    <a href="technical.html">Technical Analysis</a>
+  </nav>
+
+  <div class="demo-banner" role="note">
+    <strong>Backtest takeaway:</strong> <span id="btBannerText">Loading…</span>
+  </div>
+
+  <!-- ================= Conclusion ================= -->
+  <section id="bt-summary" class="report-section">
+    <div class="section-head">
+      <h2>Backtest Results</h2>
+      <p class="cap">2017–2026 · ≥10% drawdowns as the main statistic · 8–10% drawdowns listed separately</p>
+    </div>
+
+    <div class="kpis" id="btKpis" aria-label="Backtest statistics"></div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>In One Sentence</h2>
+          <p class="cap">The score measures relative fragility, not timing</p>
+        </div>
+      </div>
+      <p id="btConclusion" style="font-size:13.5px;line-height:1.85;color:var(--ink-2);margin:0 0 10px">
+        Loading…
+      </p>
+      <div class="alert-tags" id="btTags"></div>
+    </div>
+  </section>
+
+  <!-- ================= Score history ================= -->
+  <section id="bt-score" class="report-section">
+    <div class="section-head">
+      <h2>Score History</h2>
+      <p class="cap">Shading = ≥10% drawdown windows · red line = watch threshold</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Raw Weighted Score (0–100)</h2>
+          <p class="cap">6 weighted signals · 5-day smoothing · before most crises the absolute score is only 20–40</p>
+        </div>
+      </div>
+      <div class="legend" aria-label="Legend">
+        <span class="k"><span class="kbox" style="background:var(--s1)"></span>Raw weighted score</span>
+        <span class="k"><span class="kbox" style="background:rgba(208,59,59,.14);border:1px solid var(--crit)"></span>≥10% drawdown window</span>
+      </div>
+      <div class="chartbox" id="btChartRaw"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Rolling 3-Year Percentile (0–100)</h2>
+          <p class="cap">Where the current risk score sits relative to the past 3 years · above 80 is “relatively high”</p>
+        </div>
+      </div>
+      <div class="legend" aria-label="Legend">
+        <span class="k"><span class="kbox" style="background:var(--s2)"></span>Rolling percentile</span>
+        <span class="k"><span class="kbox" style="background:rgba(208,59,59,.14);border:1px solid var(--crit)"></span>≥10% drawdown window</span>
+      </div>
+      <div class="chartbox" id="btChartPct"></div>
+    </div>
+  </section>
+
+  <!-- ================= Episodes ================= -->
+  <section id="bt-episodes" class="report-section">
+    <div class="section-head">
+      <h2>Crisis Episodes</h2>
+      <p class="cap">T-30 / T-10 = 30 / 10 trading days before the peak</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>≥10% Drawdowns · Main Statistic</h2>
+          <p class="cap">Classification rules are in “Method” at the bottom; percentiles are rolling 3-year</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig bt-episodes">
+          <thead>
+            <tr>
+              <th>Peak</th><th>Trough</th><th>Drawdown</th>
+              <th>Raw score T-30</th><th>Raw score T-10</th>
+              <th>Pctile T-30</th><th>Pctile T-10</th>
+              <th>Verdict</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="btMajorRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>8–10% Drawdowns · Not in Main Statistics</h2>
+          <p class="cap">Short, sharp dips tracked separately so small declines aren't counted as “crises”</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig bt-sharp">
+          <thead>
+            <tr>
+              <th>Peak</th><th>Trough</th><th>Drawdown</th>
+              <th>Pctile T-30</th><th>Pctile T-10</th><th>Verdict</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="btSharpRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Why Did It Miss 2022?</h2>
+          <p class="cap">Signal composition 30 days before the peak (2021-11-19)</p>
+        </div>
+      </div>
+      <p class="bt-note" style="margin-top:0">
+        The 2022 drawdown was driven by inflation and a hawkish Fed pivot, but before the peak almost only the valuation signal was lit:
+      </p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:860px">
+          <thead>
+            <tr><th>Signal</th><th>Reading (0–100)</th><th>Weight</th><th>Contribution</th><th>Why so low</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Valuation</td><td>99</td><td>15</td><td>14.9</td><td>CAPE at a historic high — the only clear warning</td></tr>
+            <tr><td>Breadth</td><td>37</td><td>20</td><td>7.4</td><td>Equal/cap weight weakening but not collapsing</td></tr>
+            <tr><td>Credit</td><td>8</td><td>25</td><td>2.0</td><td>HYG/LQD near highs; no stress in credit markets</td></tr>
+            <tr><td>Volatility</td><td>14</td><td>15</td><td>2.1</td><td>VIX low, term structure normal</td></tr>
+            <tr><td>Rates</td><td>0</td><td>10</td><td>0.0</td><td>Real rates still deeply negative, 2s10s not inverted; the spike came after the peak</td></tr>
+            <tr><td>Macro</td><td>0</td><td>15</td><td>0.0</td><td>Unemployment low, Sahm rule not triggered</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bt-note" style="margin-bottom:0">
+        Total contribution was about 26 — a 22.7 composite after 5-day smoothing, far below the 45 watch line. 2022 was an inflation/policy-driven valuation
+        kill, not a credit/liquidity crisis; the model's signal set leans on credit and liquidity and lacks inflation, Fed policy expectations, and earnings revisions.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= Signal coverage ================= -->
+  <section id="bt-coverage" class="report-section">
+    <div class="section-head">
+      <h2>Signal Coverage</h2>
+      <p class="cap">Of the nine main-site signals, only 6 have stable free historical series</p>
+    </div>
+
+    <div class="card">
+      <p class="bt-note" style="margin-top:0">
+        Weights were redistributed across computable signals: credit 25, breadth 20, valuation 15, volatility 15, macro 15, rates 10.
+        Proxy signals differ from true HY OAS, true market breadth, and NFCI — so read the backtest as “can the framework give a relative hint,”
+        not as “live P&amp;L.”
+      </p>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig">
+          <thead>
+            <tr><th>Main-site signal</th><th>Backtest treatment</th><th>Proxy / data</th><th>Weight</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Credit spreads</td><td>Included</td><td>HYG/LQD vs 200-day MA + 3-month momentum</td><td class="num">25</td></tr>
+            <tr><td>Market breadth</td><td>Included</td><td>RSP/SPY (equal vs cap weight) vs 200-day MA + 3-month momentum</td><td class="num">20</td></tr>
+            <tr><td>Valuation</td><td>Included</td><td>Shiller CAPE 20-year rolling percentile (monthly, one-month lag)</td><td class="num">15</td></tr>
+            <tr><td>Volatility</td><td>Included</td><td>VIX 2-year percentile + VIX/VIX3M term structure</td><td class="num">15</td></tr>
+            <tr><td>Rates</td><td>Included</td><td>10Y TIPS real yield 3-month change + 2s10s</td><td class="num">10</td></tr>
+            <tr><td>Macro</td><td>Included</td><td>US monthly unemployment 12-month change (Sahm logic)</td><td class="num">15</td></tr>
+            <tr><td>Leverage &amp; liquidity</td><td>Not included</td><td>Free NFCI history unavailable</td><td class="num">—</td></tr>
+            <tr><td>Sentiment &amp; flows</td><td>Not included</td><td>No reliable free historical series</td><td class="num">—</td></tr>
+            <tr><td>Structural risk</td><td>Not included</td><td>Hard to quantify, cannot be backtested</td><td class="num">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= False positives ================= -->
+  <section id="bt-fp" class="report-section">
+    <div class="section-head">
+      <h2>Warning Errors / False Positives</h2>
+      <p class="cap">How often a warning was followed by no big decline; the percentile threshold, persistence, and drawdown size all change the answer</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Rolling-Percentile Warnings: Hits and False Alarms</h2>
+          <p class="cap">Warning = percentile ≥ threshold for ≥10 trading days · a ≥10% / ≥8% drawdown within 6 months counts as a hit</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:900px">
+          <thead>
+            <tr>
+              <th>Warning definition</th><th>Advance warnings</th>
+              <th>Hits ≥10%</th><th>False ≥10%</th><th>False rate</th>
+              <th>Hits ≥8%</th><th>False ≥8%</th><th>False rate</th>
+              <th>Post-crisis highs</th>
+            </tr>
+          </thead>
+          <tbody id="btWarnRows"></tbody>
+        </table>
+      </div>
+      <p class="bt-note" id="btWarnNote" style="margin:10px 0 0">Loading…</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Warning Detail for Percentile ≥80</h2>
+          <p class="cap">Includes hits, false alarms, and post-crisis highs; post-crisis highs occur inside known drawdowns and are not counted in the false rate</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:820px">
+          <thead>
+            <tr><th>Warning start</th><th>End</th><th>Max percentile</th><th>Drawdown at start</th><th>Max drawdown next 6 months</th><th>Outcome</th></tr>
+          </thead>
+          <tbody id="btWarnDetailRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>High Raw-Score Readings ≥60</h2>
+          <p class="cap">Stricter absolute-score definition: only readings lasting ≥20 trading days</p>
+        </div>
+      </div>
+      <p class="bt-note" id="btFpNote" style="margin-top:0">Loading…</p>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig bt-fp">
+          <thead>
+            <tr><th>Start</th><th>End</th><th>Trading days</th><th>Max raw score</th><th>Max drawdown next 6 months</th></tr>
+          </thead>
+          <tbody id="btFpRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Method ================= -->
+  <section id="bt-method" class="report-section">
+    <div class="section-head">
+      <h2>Method &amp; Data</h2>
+      <p class="cap">A backtest is a historical simulation, not live trading; only 5 ≥10% drawdowns — limited statistical significance</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Scoring and Classification</h2>
+          <p class="cap">All signals use only data available on or before the day; monthly data lags one month</p>
+        </div>
+      </div>
+      <div class="formula-box" style="margin-bottom:12px">
+        <b>Raw weighted score</b> = Σ (signal state score × weight) ÷ 100<br>
+        Weights: credit 25 · breadth 20 · valuation 15 · volatility 15 · macro 15 · rates 10<br>
+        <b>Rolling 3-year percentile</b> = percentile of the current raw score across the past 756 trading days
+      </div>
+      <ul class="bt-method-list">
+        <li><b>Early warning:</b> T-30 percentile ≥ 80, or T-10 percentile ≥ 80 with T-30 percentile ≥ 65.</li>
+        <li><b>Partial warning:</b> T-30 percentile ≥ 65, or T-10 percentile ≥ 75, but not meeting the early-warning rule.</li>
+        <li><b>Coincident confirmation:</b> within 10 trading days after the peak, the max percentile ≥ 80.</li>
+        <li><b>Missed:</b> none of the above.</li>
+        <li><b>8–10% drawdowns:</b> excluded from these classifications and listed separately, so small declines aren't counted as “crises.”</li>
+        <li><b>Drawdown definition:</b> SPY close ≥ 10% below its all-time high (main statistic) or 8–10% (listed separately).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Data Sources</h2>
+          <p class="cap">All public, no API key required</p>
+        </div>
+      </div>
+      <div class="tblwrap">
+        <table class="sig">
+          <thead>
+            <tr><th>Data</th><th>Source</th><th>Used for</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>SPY / RSP / HYG / LQD</td><td>Nasdaq API (~10 years of daily bars)</td><td>Drawdowns, breadth proxy, credit proxy</td></tr>
+            <tr><td>VIX / VIX3M</td><td>CBOE historical CSV</td><td>Volatility and term structure</td></tr>
+            <tr><td>2Y / 10Y nominal yields</td><td>US Treasury Daily Treasury Par Yield Curve</td><td>2s10s</td></tr>
+            <tr><td>10Y TIPS real yields</td><td>US Treasury Daily Treasury Real Yield Curve</td><td>Real rate change</td></tr>
+            <tr><td>US monthly unemployment</td><td>DBnomics / OECD (seasonally adjusted, 15+)</td><td>Macro / Sahm logic</td></tr>
+            <tr><td>Shiller CAPE</td><td>multpl.com monthly table</td><td>Valuation percentile</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Limitations</h2>
+          <p class="cap">These constraints directly affect the “can it predict” answer</p>
+        </div>
+      </div>
+      <ul class="bt-method-list">
+        <li><b>Proxy error:</b> HYG/LQD is not HY OAS and RSP/SPY is not true breadth; credit and breadth signals lag or distort.</li>
+        <li><b>Missing signals:</b> leverage/liquidity (NFCI), sentiment, and structural risk are excluded, so the model is less sensitive to liquidity shocks.</li>
+        <li><b>Small sample:</b> 2017–2026 has only 5 ≥10% drawdowns; any hit rate could be luck.</li>
+        <li><b>Hindsight rules:</b> the thresholds (80/65, etc.) were set after the backtest, so there is some overfitting risk; do not treat this as a live strategy.</li>
+        <li><b>Not a trading strategy:</b> no transaction costs, slippage, or taxes are modeled, and no buy/sell recommendations are given.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <b>US Stock Crash Radar · Historical Backtest</b> · Demo site · Static page (HTML + CSS + JS, zero dependencies)<br>
+    <b>Disclaimer:</b> This page is a historical simulation for educational purposes and does not constitute investment advice, an offer, or a solicitation. Past performance does not guarantee future results. Investing involves risk, including the possible loss of all principal.<br>
+    <span style="display:block;margin-top:8px">
+      <a href="index.html">← Back to radar overview</a> ·
+      <a href="#bt-summary">Conclusion</a> ·
+      <a href="#bt-score">Score history</a> ·
+      <a href="#bt-episodes">Episodes</a> ·
+      <a href="#bt-method">Method</a> ·
+      <a href="technical.html">Technical analysis</a> ·
+      <a href="../backtest.html" hreflang="zh-CN">中文版</a>
+    </span>
+  </footer>
+</div>
+
+<div id="tt" aria-hidden="true"></div>
+
+<noscript>
+  <div style="max-width:1140px;margin:12px auto;padding:12px;border:1px solid #d03b3b;border-radius:8px;color:#d03b3b">
+    Charts and backtest detail require JavaScript.
+  </div>
+</noscript>
+
+<script src="assets/backtest-data.js"></script>
+<script src="assets/backtest.js"></script>
+</body>
+</html>

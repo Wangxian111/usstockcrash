@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Stock Crash Radar · 3-Layer Trend Dashboard</title>
+<meta name="description" content="Three-layer trend tracking for US stocks: Observation ≥4/7, Warning ≥5/7, Confirmation ≥5/7 + volume. A nine-signal fundamental risk score as auxiliary context. Snapshot data, not investment advice.">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="alternate" hreflang="en" href="https://wangxian111.github.io/usstockcrash/en/">
+<link rel="alternate" hreflang="zh-CN" href="https://wangxian111.github.io/usstockcrash/">
+<link rel="alternate" hreflang="x-default" href="https://wangxian111.github.io/usstockcrash/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  /* 3-layer homepage layout */
+  .layer-hero {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    gap: 26px;
+    align-items: stretch;
+    border-left: 4px solid var(--warn);
+  }
+  .layer-current {
+    border-right: 1px solid var(--grid);
+    padding-right: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .layer-tier {
+    font-size: 28px;
+    font-weight: 750;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    margin-top: 4px;
+    color: var(--warn-text);
+  }
+  .layer-score {
+    font-size: 54px;
+    font-weight: 750;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 6px 0 2px;
+  }
+  .layer-score small {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .layer-sub { font-size: 13px; color: var(--ink-2); }
+  .layer-note { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .layer-right { min-width: 0; }
+  .layer-ladder { display: flex; align-items: stretch; margin: 14px 0 12px; }
+  .layer-step {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--page);
+    opacity: 0.55;
+  }
+  .layer-step + .layer-step { margin-left: 8px; }
+  .layer-step.active { opacity: 1; }
+  .layer-step.current {
+    border-color: var(--warn);
+    background: var(--warn-soft);
+    box-shadow: 0 0 0 1px var(--warn) inset;
+  }
+  .layer-step .ls-num { font-size: 11px; color: var(--muted); font-weight: 650; }
+  .layer-step .ls-title { font-size: 14px; font-weight: 700; margin: 2px 0; }
+  .layer-step .ls-rule { font-size: 11.5px; color: var(--ink-2); }
+  .layer-step.current .ls-title { color: var(--warn-text); }
+  .layer-summary {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--ink-2);
+    margin: 6px 0 10px;
+  }
+  .layer-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    opacity: 0.7;
+  }
+  .tier-card.active { opacity: 1; }
+  .tier-card.current {
+    border-color: var(--warn);
+    background: var(--warn-soft);
+    box-shadow: 0 0 0 1px var(--warn) inset;
+  }
+  .tier-card h3 { margin: 0; font-size: 15px; }
+  .tier-card .rule { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tier-card p { font-size: 12.5px; color: var(--ink-2); line-height: 1.7; margin: 8px 0 0; }
+  .tier-card .tag { margin-top: 8px; }
+
+  .aux-card { border-left: 4px solid var(--muted); }
+  .aux-head {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .aux-score { font-size: 40px; font-weight: 750; line-height: 1.1; letter-spacing: -0.02em; }
+  .aux-score small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+  .aux-band { font-size: 13px; font-weight: 650; color: var(--ink-2); }
+  .aux-meter-wrap { min-width: 0; }
+
+  /* Donation button styling — kept ready for when a Ko-fi / GitHub Sponsors account exists. */
+  .sponsor-btn { border-color: #ea4aaa; color: #ea4aaa; }
+  .sponsor-btn:hover { background: #ea4aaa; color: #fff !important; border-color: #ea4aaa !important; }
+  .lang-switch { font-size: 12.5px; color: var(--muted); text-decoration: none; }
+
+  @media (max-width: 900px) {
+    .layer-hero { grid-template-columns: 1fr; }
+    .layer-current {
+      border-right: 0;
+      border-bottom: 1px solid var(--grid);
+      padding-right: 0;
+      padding-bottom: 14px;
+    }
+    .layer-ladder { flex-direction: column; }
+    .layer-step + .layer-step { margin-left: 0; margin-top: 6px; }
+    .tier-grid { grid-template-columns: 1fr; }
+    .aux-head { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>US Stock Crash Radar <span class="mast-tag">3-Layer Trend Tracker</span></h1>
+      <div class="sub">Main layer: 3-layer trend tracking · Auxiliary: nine-signal fundamental risk score · Snapshot <span id="updTime">—</span> · Not live quotes</div>
+    </div>
+    <div class="mast-right">
+      <span class="src-badge"><span class="live-dot"></span> Snapshot mode</span>
+      <a class="ghost-btn" href="backtest.html" style="text-decoration:none">Backtest</a>
+      <a class="ghost-btn" href="technical.html" style="text-decoration:none">Technical</a>
+      <button class="ghost-btn" id="themeBtn" type="button">Theme: Auto</button>
+      <a class="lang-switch" href="../index.html" hreflang="zh-CN">中文</a>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="Page navigation">
+    <a href="#overview">3-Layer Overview</a>
+    <a href="#conditions">7 Conditions</a>
+    <a href="#tiers">Tier Actions</a>
+    <a href="#validation">Backtest</a>
+    <a href="#auxiliary">Risk Score</a>
+    <a href="#method">Method &amp; Risk</a>
+    <a href="backtest.html">Backtest</a>
+    <a href="technical.html">Technical</a>
+  </nav>
+
+  <div class="demo-banner" role="note">
+    <strong>The main layer is now “3-layer trend tracking.”</strong> Current snapshot <span id="bannerDate">—</span>: start with the top tier and the 7 conditions; the original nine-signal fundamental risk score is below, as auxiliary context.
+    All readings are snapshots, not live quotes, and do not constitute investment advice.
+  </div>
+
+  <!-- ================= 3-Layer Overview ================= -->
+  <section id="overview" class="report-section">
+    <div class="card layer-hero" id="layerHero">
+      <div class="layer-current">
+        <div class="eyebrow">Current Tier</div>
+        <div class="layer-tier" id="layerTier">Warning</div>
+        <div class="layer-score"><span id="layerScore">5</span><small>/7 conditions</small></div>
+        <div class="layer-sub" id="layerSub">Volume confirmation: not triggered (1.03×)</div>
+        <div class="layer-note">Snapshot <span id="layerDate">—</span> · Not live quotes</div>
+      </div>
+      <div class="layer-right">
+        <div class="eyebrow">Three Layers</div>
+        <div class="layer-ladder" id="layerLadder">
+          <div class="layer-step" data-tier="observe">
+            <div class="ls-num">01</div>
+            <div class="ls-title">Observation</div>
+            <div class="ls-rule">≥4/7 conditions</div>
+          </div>
+          <div class="layer-step" data-tier="warn">
+            <div class="ls-num">02</div>
+            <div class="ls-title">Warning</div>
+            <div class="ls-rule">≥5/7 conditions</div>
+          </div>
+          <div class="layer-step" data-tier="confirm">
+            <div class="ls-num">03</div>
+            <div class="ls-title">Confirmation</div>
+            <div class="ls-rule">≥5/7 + volume</div>
+          </div>
+        </div>
+        <p class="layer-summary" id="layerSummary">Loading…</p>
+        <div class="layer-tags" id="layerTags"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KPI ================= -->
+  <section class="kpis" id="layerKpis" aria-label="3-layer tracking core metrics"></section>
+
+  <!-- ================= 7 Conditions ================= -->
+  <section id="conditions" class="report-section">
+    <div class="section-head">
+      <h2>7-Condition Tracker</h2>
+      <p class="cap">The main layer tracks only these 7 trend / volatility / momentum conditions; volume is a separate confirmation layer</p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Item-by-Item Readings</h2>
+          <p class="cap">Percentile = the current value's percentile within the extended window; low-percentile conditions trigger in the bottom 20%, high-percentile conditions in the top 20%</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" id="conditionTable">
+          <thead>
+            <tr>
+              <th>Condition</th><th>Type</th><th>Reading</th><th>Percentile</th>
+              <th>Threshold</th><th>Status</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="conditionRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" id="conditionNote" style="margin:10px 0 0">Loading…</p>
+    </div>
+  </section>
+
+  <!-- ================= Tier Actions ================= -->
+  <section id="tiers" class="report-section">
+    <div class="section-head">
+      <h2>What Each Tier Means</h2>
+      <p class="cap">Higher tier = tighten risk; this is not a tool for predicting specific drawdown dates</p>
+    </div>
+    <div class="tier-grid" id="tierCards"></div>
+  </section>
+
+  <!-- ================= Historical Validation ================= -->
+  <section id="validation" class="report-section">
+    <div class="section-head">
+      <h2>Historical Validation</h2>
+      <p class="cap">2017–2026 · 9 episodes of 8% two-week drawdowns · Trend confirmation, not top calling</p>
+    </div>
+    <div class="card">
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" id="profileTable">
+          <thead>
+            <tr>
+              <th>Variant</th><th>Rule</th><th>Alerts / year</th>
+              <th>Day win rate</th><th>Event recall</th><th>Median drawdown at trigger</th>
+            </tr>
+          </thead>
+          <tbody id="profileRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        Across the 9 episodes, variant B (≥5/7) covered all of them — but <b>0/9 triggered before the peak</b>: at the median trigger the market had already fallen ~6% from the high,
+        17 trading days off the peak. It is a “trend confirmation / defensive de-risking” tool, not a top predictor.
+      </p>
+      <p class="cap" style="margin-top:8px">
+        <a href="technical.html">Full technical analysis: single indicators, three combos, crash frequency →</a> ·
+        <a href="backtest.html">Historical backtest: episode detail, false positives →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= Auxiliary Risk Score ================= -->
+  <section id="auxiliary" class="report-section">
+    <div class="section-head">
+      <h2>Auxiliary: Nine-Signal Fundamental Risk Score</h2>
+      <p class="cap">Slow variables / credit / valuation composite · Context only, not a main-layer trigger</p>
+    </div>
+
+    <div class="card aux-card">
+      <div class="aux-head">
+        <div>
+          <div class="eyebrow">Auxiliary Risk Score</div>
+          <div class="aux-score"><span id="auxScore">26.3</span><small>/100</small></div>
+          <div class="aux-band" id="auxBand">Watch</div>
+        </div>
+        <div class="aux-meter-wrap">
+          <div class="risk-meter" id="auxMeter" role="img" aria-label="Auxiliary risk score 26.3, watch zone">
+            <div class="rm-seg rm-calm" style="width:25%"></div>
+            <div class="rm-seg rm-watch" style="width:20%"></div>
+            <div class="rm-seg rm-elev" style="width:20%"></div>
+            <div class="rm-seg rm-alert" style="width:20%"></div>
+            <div class="rm-seg rm-crisis" style="width:15%"></div>
+            <div class="rm-marker" id="auxMarker" style="left:26.3%"><span></span></div>
+          </div>
+          <div class="risk-scale">
+            <span style="left:0%">0 Calm</span>
+            <span style="left:25%">25 Watch</span>
+            <span style="left:45%">45 Concern</span>
+            <span style="left:65%">65 Alert</span>
+            <span style="left:85%">85 Crisis</span>
+            <span style="left:100%">100</span>
+          </div>
+          <p class="tech-note" style="margin:6px 0 0">0–24 Calm · 25–44 Watch · 45–64 Concern · 65–84 Alert · 85–100 Crisis</p>
+        </div>
+      </div>
+
+      <p class="tech-note" id="auxNote" style="margin:6px 0 10px">Loading…</p>
+
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig">
+          <thead>
+            <tr><th>Signal</th><th>Reading (0–100)</th><th>Weight</th><th>Contribution</th><th>Notes</th></tr>
+          </thead>
+          <tbody id="auxRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        The auxiliary score weights 6 backtestable signals (credit 25 · breadth 20 · valuation 15 · volatility 15 · macro 15 · rates 10).
+        Leverage/liquidity, sentiment, and structural risks lack stable free history and are excluded; the legacy 9-signal table is therefore “6 computed + 3 unmodeled.”
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= Method & Risk Budget ================= -->
+  <section id="method" class="report-section">
+    <div class="section-head">
+      <h2>Method &amp; Risk Budget</h2>
+      <p class="cap">Read the main layer first, then use the auxiliary score as background; when they disagree, follow the main layer's risk actions</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>How the Main Layer Works</h2>
+          <p class="cap">7 conditions, extended-window percentiles, no look-ahead</p>
+        </div>
+      </div>
+      <div class="formula-box" style="margin-bottom:10px">
+        <b>Observation tier:</b> ≥4 of 7 conditions triggered<br>
+        <b>Warning tier:</b> ≥5 triggered<br>
+        <b>Confirmation tier:</b> ≥5 triggered + volume &gt;1.5× 20-day average<br>
+        Percentiles: low-percentile conditions trigger in the bottom 20%, high-percentile conditions in the top 20%.
+      </div>
+      <ul class="tech-list">
+        <li><b>Trend:</b> close &lt;200-day MA, close &lt;50-day MA, weekly close &lt;30-week MA.</li>
+        <li><b>Momentum:</b> RSI(14) bottom 20%, MACD histogram bottom 20%.</li>
+        <li><b>Volatility:</b> ATR top 20%, VIX top 20%.</li>
+        <li><b>Confirmation:</b> volume &gt;1.5× 20-day average (a separate confirmation layer, not counted among the 7 conditions).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Historical Boundaries</h2>
+          <p class="cap">These numbers determine what it can and cannot do</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>What it can do:</b> after a decline has started, confirm trend damage and help with de-risking/tightening controls; variant B covered 9/9 in-sample episodes.</li>
+        <li><b>What it cannot do:</b> predict tops. 0/9 triggered before the peak; at the median trigger ~6% had already been lost.</li>
+        <li><b>Small sample:</b> 2017–2026 has only 9 episodes of 8% two-week drawdowns; the three combos are in-sample screens — discount the win rates.</li>
+        <li><b>Auxiliary score's role:</b> valuation/credit/macro are slow variables; the current auxiliary score of 26.3 (Watch) disagrees with the main layer's 5/7 Warning, meaning the technical layer deteriorated first while fundamentals have not confirmed.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Risk Budget</h2>
+          <p class="cap">Tiers are only reminders — position sizing decides survival</p>
+        </div>
+      </div>
+      <ul class="checklist">
+        <li>Any single high-volatility holding ≤ 5% of the portfolio.</li>
+        <li>Leveraged ETFs in total ≤ 10%, with a −20% stop preset.</li>
+        <li>Keep 6–12 months of living expenses in cash.</li>
+        <li>No margin-chasing; never invest money you need soon.</li>
+        <li>Positions that can't survive the drawdown have no bounce to look forward to.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <b>US Stock Crash Radar · 3-Layer Trend Tracker</b> · Demo site · Static page (HTML + CSS + JS, zero dependencies)<br>
+    <b>Data sources:</b> SPY daily/weekly OHLCV, CBOE VIX/VIX3M, US Treasury yields, DBnomics/OECD unemployment, Shiller CAPE.
+    Currently a <span id="footerDate">—</span> snapshot, not live quotes; historical drawdown figures are approximate.<br>
+    <b>Disclaimer:</b> Nothing on this page constitutes investment advice, an offer, or a solicitation. Past performance does not guarantee future results. Investing involves risk, including the possible loss of all principal.
+    Any investment decision should account for your personal finances, risk tolerance, and time horizon — consult a licensed financial advisor.<br>
+    <span style="display:block;margin-top:8px">
+      Page navigation:
+      <a href="#overview">Overview</a> ·
+      <a href="#conditions">7 Conditions</a> ·
+      <a href="#tiers">Tier Actions</a> ·
+      <a href="#validation">Backtest</a> ·
+      <a href="#auxiliary">Risk Score</a> ·
+      <a href="#method">Method</a> ·
+      <a href="backtest.html">Backtest</a> ·
+      <a href="technical.html">Technical</a> ·
+      <a href="../index.html" hreflang="zh-CN">中文版</a>
+    </span>
+  </footer>
+</div>
+
+<noscript>
+  <div style="max-width:1140px;margin:12px auto;padding:12px;border:1px solid #d03b3b;border-radius:8px;color:#d03b3b">
+    The 3-layer tracker and auxiliary score require JavaScript.
+  </div>
+</noscript>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

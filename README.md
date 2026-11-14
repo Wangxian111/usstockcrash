@@ -17,6 +17,11 @@ USStockcrashedOfficial/
 ├─ index.html              # 三层趋势雷达首页
 ├─ backtest.html           # 2017–2026 历史回测页
 ├─ technical.html          # 技术分析叠加页
+├─ en/                     # 英文版（面向海外流量与赞助）
+│  ├─ index.html
+│  ├─ backtest.html
+│  ├─ technical.html
+│  └─ assets/              # 英文版 JS 与数据（由 scripts/build_en.py 生成）
 ├─ assets/
 │  ├─ site.css             # 设计令牌与组件样式（复用 GoldWebsite 调色板）
 │  ├─ app.js               # 主站数据、评分渲染、图表、主题切换
@@ -33,9 +38,50 @@ USStockcrashedOfficial/
 │  └─ raw/                 # 回测原始数据缓存（自动生成）
 ├─ scripts/
 │  ├─ build_backtest.py    # 回测数据构建脚本
-│  └─ build_technical.py   # 技术分析构建脚本
+│  ├─ build_technical.py   # 技术分析构建脚本
+│  └─ build_en.py          # 生成英文版 assets（文案替换，不重新计算数据）
 └─ README.md
 ```
+
+## 英文版（en/）
+
+`en/` 是同一套数据的英文界面，面向海外流量：默认入口 `https://wangxian111.github.io/usstockcrash/en/`。
+
+- **页面一一对应**：`en/index.html`、`en/backtest.html`、`en/technical.html`。
+- **共用资源**：CSS、favicon 走 `../assets/`；JS 与数据在 `en/assets/`（英文文案）。
+- **语言切换**：中文页右上角 `EN` 按钮，英文页右上角 `中文`。
+- **hreflang**：六个页面都带 `en` / `zh-CN` / `x-default` 互指标签，便于搜索引擎分流。
+- **数据不重复计算**：`en/assets/backtest-data.js`、`technical-data.js` 由 `scripts/build_en.py` 从中文版做纯文案替换生成。
+
+更新数据后的正确顺序：
+
+```powershell
+python scripts\build_backtest.py
+python scripts\build_technical.py
+python scripts\build_en.py        # 重新生成 en/assets/*.js
+```
+
+`build_en.py` 会校验每条替换是否命中；若中文源改了措辞导致未命中，脚本会报 `[MISS]` 并退出，不会静默漏译。
+
+### 打赏按钮（暂未启用）
+
+GitHub Sponsors 与 Ko-fi 账户尚未开通，因此英文页目前**没有**打赏按钮，避免死链。
+样式已在三个英文页的 `<style>` 中预留（`.sponsor-btn`）。账户开通后，在英文页 masthead 的 `Theme: Auto` 按钮前插入：
+
+```html
+<a class="ghost-btn sponsor-btn" href="https://ko-fi.com/你的handle" target="_blank" rel="noopener" style="text-decoration:none">♥ Support</a>
+<a class="ghost-btn" href="https://github.com/sponsors/Wangxian111" target="_blank" rel="noopener" style="text-decoration:none">★ Sponsor</a>
+```
+
+页脚可再补一句引导（英文页 footer 已有位置，可加在 `Page navigation` 之前）：
+
+```html
+<span style="display:block;margin-top:8px">
+  If this radar helps you, consider
+  <a href="https://ko-fi.com/你的handle" target="_blank" rel="noopener" style="color:#ea4aaa">buying me a coffee</a>.
+</span>
+```
+
 
 ## 页面内容
 

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technical Analysis · US Stock Crash Radar</title>
+<meta name="description" content="Using daily/weekly technical indicators to predict ≥10% drawdowns over the next 6 months: single-indicator hit rates, pure technical models, fundamental overlay, year-by-year stability. Educational and research use only, not investment advice.">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="alternate" hreflang="en" href="https://wangxian111.github.io/usstockcrash/en/technical.html">
+<link rel="alternate" hreflang="zh-CN" href="https://wangxian111.github.io/usstockcrash/technical.html">
+<link rel="alternate" hreflang="x-default" href="https://wangxian111.github.io/usstockcrash/technical.html">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  .tech-indicators { min-width: 980px; }
+  .tech-models { min-width: 860px; }
+  .tech-yearly { min-width: 900px; }
+  .tech-note { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; }
+  .tech-note b { color: var(--ink); }
+  .tech-list { margin: 0; padding-left: 1.2em; color: var(--ink-2); font-size: 12.5px; line-height: 1.85; }
+  .tech-list li { margin-bottom: 4px; }
+  /* Donation button styling — kept ready for when a Ko-fi / GitHub Sponsors account exists. */
+  .sponsor-btn { border-color: #ea4aaa; color: #ea4aaa; }
+  .sponsor-btn:hover { background: #ea4aaa; color: #fff !important; border-color: #ea4aaa !important; }
+  .lang-switch { font-size: 12.5px; color: var(--muted); text-decoration: none; }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>Technical Analysis Overlay <span class="mast-tag">2017–2026</span></h1>
+      <div class="sub">Daily / weekly OHLCV · ≥10% drawdowns over the next 6 months · model evaluation through <span id="techAsOf">—</span> · price chart through the latest weekly bar · not investment advice</div>
+    </div>
+    <div class="mast-right">
+      <a class="ghost-btn" href="index.html" style="text-decoration:none">← Radar home</a>
+      <a class="ghost-btn" href="backtest.html" style="text-decoration:none">← Backtest</a>
+      <button class="ghost-btn" id="themeBtn" type="button">Theme: Auto</button>
+      <a class="lang-switch" href="../technical.html" hreflang="zh-CN">中文</a>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="Page navigation">
+    <a href="#tech-summary">Conclusion</a>
+    <a href="#tech-indicators">Single Indicators</a>
+    <a href="#tech-models">Model Comparison</a>
+    <a href="#tech-combos">Three Combos</a>
+    <a href="#tech-improve">Improving the Hit Rate</a>
+    <a href="#tech-yearly">Yearly Stability</a>
+    <a href="#tech-chart">Price Chart</a>
+    <a href="#tech-crash-frequency">Crash Frequency</a>
+    <a href="#tech-method">Method</a>
+  </nav>
+
+  <div class="demo-banner" role="note">
+    <strong>Takeaway:</strong> <span id="techBannerText">Loading…</span>
+  </div>
+
+  <!-- ================= Conclusion ================= -->
+  <section id="tech-summary" class="report-section">
+    <div class="section-head">
+      <h2>Core Conclusion</h2>
+      <p class="cap">The main analysis keeps only samples within 5% of the high, simulating “judging the next crash from a high”</p>
+    </div>
+
+    <div class="kpis" id="techKpis" aria-label="Technical analysis statistics"></div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Is Technical Analysis Worth Adding?</h2>
+          <p class="cap">Hit rate = share of warnings followed by a ≥10% drawdown within the next 6 months</p>
+        </div>
+      </div>
+      <p id="techConclusion" style="font-size:13.5px;line-height:1.9;color:var(--ink-2);margin:0 0 10px">
+        Loading…
+      </p>
+      <div class="alert-tags" id="techTags"></div>
+    </div>
+  </section>
+
+  <!-- ================= Single indicators ================= -->
+  <section id="tech-indicators" class="report-section">
+    <div class="section-head">
+      <h2>Single Indicators: Which Have Predictive Power?</h2>
+      <p class="cap">Sorted by lift · base rate <span id="techBaseRate">—</span> · near-high sample</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Daily / Weekly Indicators</h2>
+          <p class="cap">Signal days = trading days on which the condition held; lift = signal hit rate ÷ base rate</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig tech-indicators">
+          <thead>
+            <tr>
+              <th>Indicator</th><th>Type</th><th>Signal days</th><th>Hit rate</th>
+              <th>Lift</th><th>Recall</th><th>False rate</th><th>Avg. next-6M drawdown</th>
+            </tr>
+          </thead>
+          <tbody id="techIndicatorRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" id="techIndicatorNote" style="margin:10px 0 0"></p>
+      <details class="data-table">
+        <summary>View the full-sample indicator table (not just near highs)</summary>
+        <div class="tblwrap">
+          <table class="sig tech-indicators">
+            <thead>
+              <tr>
+                <th>Indicator</th><th>Type</th><th>Signal days</th><th>Hit rate</th>
+                <th>Lift</th><th>Recall</th><th>False rate</th><th>Avg. next-6M drawdown</th>
+              </tr>
+            </thead>
+            <tbody id="techAllRows"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= Model comparison ================= -->
+  <section id="tech-models" class="report-section">
+    <div class="section-head">
+      <h2>Model Comparison: Pure Technical vs Fundamental Overlay</h2>
+      <p class="cap">Purged walk-forward · train on prior years only · take the top 20% / 10% within each test year</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Hit Rate, AUC, and Stability</h2>
+          <p class="cap">AUC 0.5 ≈ random; hit-rate parentheses are Wilson 95% intervals (overlapping labels mean real uncertainty is larger)</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig tech-models">
+          <thead>
+            <tr>
+              <th>Model</th><th>Top 20% hit rate</th><th>Top 10% hit rate</th>
+              <th>AUC</th><th>Top 20% recall</th><th>Top 20% false rate</th><th>Lift</th>
+            </tr>
+          </thead>
+          <tbody id="techModelRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" id="techModelNote" style="margin:10px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- ================= Three combos ================= -->
+  <section id="tech-combos" class="report-section">
+    <div class="section-head">
+      <h2>Three Combos: From Low to High Frequency</h2>
+      <p class="cap">Target: an 8% two-week close-to-close decline within the next 10 trading days · 2017–2026 · event-level test</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Combo Comparison</h2>
+          <p class="cap">Hit rate = share of warning days followed by an 8% two-week crash within 10 trading days; base rate 3.3%</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:1040px">
+          <thead>
+            <tr>
+              <th>Variant</th><th>Conditions</th><th>Trigger threshold</th>
+              <th>Warning days/yr</th><th>Warning spells/yr</th><th>Day hit rate</th>
+              <th>Event recall</th><th>Spell hit rate</th><th>Median days from peak</th><th>Median drawdown</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A Low-frequency, conservative</td><td>7 trend/volatility conditions</td><td>≥6/7</td>
+              <td class="num">17</td><td class="num">2.7</td><td class="num">21.5%</td>
+              <td class="num">7/9</td><td class="num">26%</td><td class="num">+19 d</td><td class="num">−6.7%</td>
+            </tr>
+            <tr>
+              <td>B Balanced (recommended)</td><td>Same 7 conditions</td><td>≥5/7</td>
+              <td class="num">29</td><td class="num">4.4</td><td class="num">19.8%</td>
+              <td class="num">9/9</td><td class="num">20%</td><td class="num">+17 d</td><td class="num">−6.0%</td>
+            </tr>
+            <tr>
+              <td>C High-frequency, sensitive</td><td>11 broad conditions</td><td>≥5/11</td>
+              <td class="num">52</td><td class="num">7.8</td><td class="num">13.0%</td>
+              <td class="num">9/9</td><td class="num">12%</td><td class="num">+17 d</td><td class="num">−4.7%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        All three variants have high event recall, but <b>0/9 triggered before the peak</b>: at the median trigger the market had already fallen 5–7% from the high,
+        17–19 trading days off the peak. They are “trend confirmation / defensive de-risking” tools, not top predictors.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Condition Detail</h2>
+          <p class="cap">All use extended-window percentiles to avoid look-ahead</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>The 7 conditions in A/B:</b> close &lt;200-day MA, close &lt;50-day MA, RSI(14) bottom 20%, weekly close &lt;30-week MA, ATR top 20%, VIX top 20%, MACD histogram bottom 20%.</li>
+        <li><b>The 11 conditions in C:</b> A/B plus weekly RSI bottom 20%, 21-day ROC bottom 20%, volume &gt;1.5× 20-day average, drawdown-from-high bottom 20%.</li>
+        <li><b>Pure fundamentals are weaker:</b> among credit/breadth/valuation/rates/macro, only the volatility (VIX) signal has a 10.9% hit rate (lift 3.27); high breadth and valuation percentiles are actually contrarian (lift 0.5–0.6). So all three variants are “trend first, volatility second.”</li>
+        <li><b>How to choose:</b> pick A if you don't want frequent interruptions; B to catch every in-sample event; C for tactical risk control where extra false alarms are acceptable.</li>
+        <li><b>In-sample caveat:</b> the three condition sets were screened on the full sample, so these are in-sample results; no independent out-of-sample feature selection was done — discount the hit rates.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= Improving the hit rate ================= -->
+  <section id="tech-improve" class="report-section">
+    <div class="section-head">
+      <h2>How Can You Improve the Warning Hit Rate?</h2>
+      <p class="cap">Raising precision usually costs recall and later exits; decide which you want first</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>The Most Effective Single Improvement: Add Volume Confirmation</h2>
+          <p class="cap">B ≥5/7 + volume &gt;1.5× 20-day average</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:760px">
+          <thead>
+            <tr><th>Rule</th><th>Warning days/yr</th><th>Day hit rate</th><th>Spell hit rate</th><th>Event recall</th><th>Median drawdown at trigger</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>B baseline (≥5/7)</td><td class="num">29</td><td class="num">19.8%</td><td class="num">20%</td><td class="num">9/9</td><td class="num">−6.0%</td></tr>
+            <tr><td><b>B + volume confirmation</b></td><td class="num">4</td><td class="num"><b>45.0%</b></td><td class="num">33%</td><td class="num">8/9</td><td class="num">−8.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        The hit rate doubles, but triggers come later: the median drawdown at trigger widens from −6.0% to −8.2%, and 1/9 events are missed.
+        Best for defensive users who would rather under-warn than be interrupted often.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Other Attempts: Mostly No Improvement</h2>
+          <p class="cap">Same 8% crash within 10 trading days definition</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>Credit-signal top-20% filter:</b> hit rate 26.4%, but covers only 4/9 events — too strict.</li>
+        <li><b>VIX term-structure inversion:</b> hit rate 15.7%, covers 7/9 — worse than the baseline.</li>
+        <li><b>2/3/5-day persistence confirmation:</b> hit rates 19.7% / 19.0% / 17.3% — no improvement, just delay.</li>
+        <li><b>Weekly Bollinger expansion top 20%:</b> hit rate 22.1%, but covers only 3/9.</li>
+        <li><b>Within 2% of the high only:</b> trend indicators barely light up; the only improvement is VIX top 20% (8.2% vs 1.1%, lift 7.5), but the sample is tiny — “leading but weak.”</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>The More Practical Approach: Tiered Warnings</h2>
+          <p class="cap">Don't chase a single “perfect hit rate”; tier signals by their hit rate and coverage instead</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>Observation tier:</b> B ≥4/7 — broad coverage, use it to start reviewing positions.</li>
+        <li><b>Warning tier:</b> B ≥5/7 — balanced, use it to scale out / tighten risk controls.</li>
+        <li><b>Confirmation tier:</b> B ≥5/7 + volume — higher hit rate but later trigger, use it for the final defensive actions.</li>
+        <li><b>Data and validation:</b> only 9 events in 10 years is a tiny sample; real reliability gains require longer history (from 1990), independent out-of-sample tests, and event-level confidence intervals — not more conditions.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= Yearly stability ================= -->
+  <section id="tech-yearly" class="report-section">
+    <div class="section-head">
+      <h2>Yearly Stability</h2>
+      <p class="cap">A model is only trustworthy if it holds up across different years</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Year-by-Year Results</h2>
+          <p class="cap">2022 had only 17 days within 5% of the high, so it is skipped; 2023 had only 35 days and is also skipped</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig tech-yearly">
+          <thead>
+            <tr>
+              <th>Year</th><th>Near-high days</th><th>Base rate</th>
+              <th>Pure technical top 20%</th><th>Pure technical AUC</th>
+              <th>Fundamental top 20%</th><th>Combined top 20%</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="techYearlyRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" id="techStabilityNote" style="margin:10px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- ================= Price chart ================= -->
+  <section id="tech-chart" class="report-section">
+    <div class="section-head">
+      <h2>SPY and the 200-Day MA</h2>
+      <p class="cap">Shading = drawdown ≥10% from the all-time high · weekly closes · price chart through the latest weekly bar</p>
+    </div>
+
+    <div class="card">
+      <div class="legend" aria-label="Legend">
+        <span class="k"><span class="kbox" style="background:var(--s1)"></span>SPY close</span>
+        <span class="k"><span class="kbox" style="background:var(--s2)"></span>200-day MA</span>
+        <span class="k"><span class="kbox" style="background:rgba(208,59,59,.14);border:1px solid var(--crit)"></span>Drawdown ≥10%</span>
+      </div>
+      <div class="chartbox" id="techChart"></div>
+    </div>
+  </section>
+
+  <!-- ================= Two-week crash frequency ================= -->
+  <section id="tech-crash-frequency" class="report-section">
+    <div class="section-head">
+      <h2>Two-Week Crash Frequency</h2>
+      <p class="cap">SPY daily · 2017–2026 (2026 through Nov 9) · each decline counted once</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>10-Trading-Day Close-to-Close Decline</h2>
+          <p class="cap">Closer to “net two-week decline”; 10-day cooldown after a trigger, counted in the year of the start date</p>
+        </div>
+      </div>
+      <p class="scroll-hint">Table scrolls horizontally →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:640px">
+          <thead>
+            <tr><th>Year</th><th>≥5%</th><th>≥8%</th><th>≥10%</th><th>≥15%</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>2017</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td>2018</td><td class="num">5</td><td class="num">2</td><td class="num">1</td><td class="num">0</td></tr>
+            <tr><td>2019</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td>2020</td><td class="num">5</td><td class="num">2</td><td class="num">2</td><td class="num">1</td></tr>
+            <tr><td>2021</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td>2022</td><td class="num">9</td><td class="num">4</td><td class="num">2</td><td class="num">0</td></tr>
+            <tr><td>2023</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td>2024</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td>2025</td><td class="num">2</td><td class="num">1</td><td class="num">1</td><td class="num">0</td></tr>
+            <tr><td>2026*</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td>Total</td><td class="num">23</td><td class="num">9</td><td class="num">6</td><td class="num">1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        10 trading days ≈ 2 weeks; each decline is counted once (at least 10 trading days must pass before the next count).
+        Close-to-close measures the “net decline” and is more conservative than intraday high-to-low. 2026 is a partial year.
+      </p>
+
+      <details class="data-table">
+        <summary>View the “intraday high-to-low within 10 days” definition</summary>
+        <p class="tech-note" style="margin:8px 0">
+          Intraday definition: a high followed by a low within 10 trading days with a max swing above the threshold. It also counts
+          “intraday flash crashes that close back up,” so counts are higher.
+        </p>
+        <div class="tblwrap">
+          <table class="sig" style="min-width:640px">
+            <thead>
+              <tr><th>Year</th><th>≥5%</th><th>≥8%</th><th>≥10%</th><th>≥15%</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2017</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+              <tr><td>2018</td><td class="num">8</td><td class="num">3</td><td class="num">2</td><td class="num">0</td></tr>
+              <tr><td>2019</td><td class="num">3</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+              <tr><td>2020</td><td class="num">11</td><td class="num">4</td><td class="num">3</td><td class="num">2</td></tr>
+              <tr><td>2021</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+              <tr><td>2022</td><td class="num">17</td><td class="num">9</td><td class="num">5</td><td class="num">0</td></tr>
+              <tr><td>2023</td><td class="num">4</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+              <tr><td>2024</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+              <tr><td>2025</td><td class="num">4</td><td class="num">2</td><td class="num">2</td><td class="num">1</td></tr>
+              <tr><td>2026*</td><td class="num">4</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+              <tr><td>Total</td><td class="num">56</td><td class="num">20</td><td class="num">12</td><td class="num">3</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= Method ================= -->
+  <section id="tech-method" class="report-section">
+    <div class="section-head">
+      <h2>Method &amp; Data</h2>
+      <p class="cap">Technical indicators use only data available on or before the day; the target uses the next 126 trading days</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Indicator Set</h2>
+          <p class="cap">Daily + weekly, no parameter optimization, to avoid overfitting</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>Trend:</b> close vs 20/50/200-day MAs, 50/200 death cross, weekly close vs 30-week MA.</li>
+        <li><b>Momentum:</b> RSI(14), MACD(12,26,9), 21/63-day ROC, weekly RSI, weekly MACD, 4-week ROC.</li>
+        <li><b>Volatility:</b> Bollinger band width and percentile, ATR/close and percentile, weekly Bollinger width percentile.</li>
+        <li><b>Volume:</b> volume / 20-day average volume.</li>
+        <li><b>Candlestick patterns:</b> bearish engulfing, shooting star, outside-down day, gap down (daily).</li>
+        <li><b>Target:</b> max drawdown of SPY from the current close ≤ −10% within the next 126 trading days.</li>
+        <li><b>Sample:</b> only trading days within 5% of the all-time high, so “already falling” isn't mistaken for “predicting a fall.”</li>
+        <li><b>Model:</b> L2 logistic regression, class_weight=balanced; purged walk-forward with the last 190 training days dropped each year to avoid label overlap.</li>
+        <li><b>Warnings:</b> within each test year, take the top 20% / 10% by predicted percentile for retrospective evaluation; live thresholds must come from the training set.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Limitations</h2>
+          <p class="cap">These constraints mean the “hit rate” cannot be read as live returns</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>Small sample:</b> about 1,573 near-high days, but very few independent events; labels overlap heavily.</li>
+        <li><b>Unstable by year:</b> the pure technical model had a 0% hit rate in 2021 and 65.9% in 2025, with a median of only 20.4%.</li>
+        <li><b>Weak AUC:</b> the pure technical model's AUC is 0.522, only slightly above random; the 42.9% top-10% hit rate may be driven by a few periods.</li>
+        <li><b>No gain from the overlay:</b> the fundamental risk score barely lights up near highs (≥45 only 10 times, 0% hit rate), and adding it actually drags the pure technical model from 30.9% down to 27.0%.</li>
+        <li><b>Not a trading strategy:</b> no transaction costs, slippage, or taxes are modeled, and no buy/sell recommendations are given.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <b>US Stock Crash Radar · Technical Analysis Overlay</b> · Demo site · Static page (HTML + CSS + JS, zero dependencies)<br>
+    <b>Disclaimer:</b> This page is a historical simulation for educational purposes and does not constitute investment advice, an offer, or a solicitation. Past performance does not guarantee future results. Investing involves risk, including the possible loss of all principal.<br>
+    <span style="display:block;margin-top:8px">
+      <a href="index.html">← Radar overview</a> ·
+      <a href="backtest.html">← Historical backtest</a> ·
+      <a href="#tech-summary">Conclusion</a> ·
+      <a href="#tech-indicators">Single indicators</a> ·
+      <a href="#tech-models">Model comparison</a> ·
+      <a href="#tech-method">Method</a> ·
+      <a href="../technical.html" hreflang="zh-CN">中文版</a>
+    </span>
+  </footer>
+</div>
+
+<div id="tt" aria-hidden="true"></div>
+
+<noscript>
+  <div style="max-width:1140px;margin:12px auto;padding:12px;border:1px solid #d03b3b;border-radius:8px;color:#d03b3b">
+    Charts and technical analysis results require JavaScript.
+  </div>
+</noscript>
+
+<script src="assets/technical-data.js"></script>
+<script src="assets/technical.js"></script>
+</body>
+</html>
