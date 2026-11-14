@@ -753,5 +753,3 @@ footer a:hover { text-decoration: underline; }
   body { background: #ffffff; }
   .card, .stat { box-shadow: none; break-inside: avoid; }
 }
-
-.sponsor-btn:hover { background:#ea4aaa; color:#fff !important; border-color:#ea4aaa !important; }
