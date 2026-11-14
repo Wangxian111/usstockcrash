@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美股暴跌预警 · 三层趋势雷达</title>
+<meta name="description" content="以三层趋势跟踪为主：观察层 ≥4/7、警告层 ≥5/7、确认层 ≥5/7 + 放量。原九信号基本面风险分降为辅助信息。快照数据，不构成投资建议。">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* 三层首页专用布局 */
+  .layer-hero {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    gap: 26px;
+    align-items: stretch;
+    border-left: 4px solid var(--warn);
+  }
+  .layer-current {
+    border-right: 1px solid var(--grid);
+    padding-right: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .layer-tier {
+    font-size: 28px;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    margin-top: 4px;
+    color: var(--warn-text);
+  }
+  .layer-score {
+    font-size: 54px;
+    font-weight: 750;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 6px 0 2px;
+  }
+  .layer-score small {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .layer-sub { font-size: 13px; color: var(--ink-2); }
+  .layer-note { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .layer-right { min-width: 0; }
+  .layer-ladder { display: flex; align-items: stretch; margin: 14px 0 12px; }
+  .layer-step {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--page);
+    opacity: 0.55;
+  }
+  .layer-step + .layer-step { margin-left: 8px; }
+  .layer-step.active { opacity: 1; }
+  .layer-step.current {
+    border-color: var(--warn);
+    background: var(--warn-soft);
+    box-shadow: 0 0 0 1px var(--warn) inset;
+  }
+  .layer-step .ls-num { font-size: 11px; color: var(--muted); font-weight: 650; }
+  .layer-step .ls-title { font-size: 14px; font-weight: 700; margin: 2px 0; }
+  .layer-step .ls-rule { font-size: 11.5px; color: var(--ink-2); }
+  .layer-step.current .ls-title { color: var(--warn-text); }
+  .layer-summary {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--ink-2);
+    margin: 6px 0 10px;
+  }
+  .layer-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    opacity: 0.7;
+  }
+  .tier-card.active { opacity: 1; }
+  .tier-card.current {
+    border-color: var(--warn);
+    background: var(--warn-soft);
+    box-shadow: 0 0 0 1px var(--warn) inset;
+  }
+  .tier-card h3 { margin: 0; font-size: 15px; }
+  .tier-card .rule { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tier-card p { font-size: 12.5px; color: var(--ink-2); line-height: 1.7; margin: 8px 0 0; }
+  .tier-card .tag { margin-top: 8px; }
+
+  .aux-card { border-left: 4px solid var(--muted); }
+  .aux-head {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .aux-score { font-size: 40px; font-weight: 750; line-height: 1.1; letter-spacing: -0.02em; }
+  .aux-score small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+  .aux-band { font-size: 13px; font-weight: 650; color: var(--ink-2); }
+  .aux-meter-wrap { min-width: 0; }
+
+  @media (max-width: 900px) {
+    .layer-hero { grid-template-columns: 1fr; }
+    .layer-current {
+      border-right: 0;
+      border-bottom: 1px solid var(--grid);
+      padding-right: 0;
+      padding-bottom: 14px;
+    }
+    .layer-ladder { flex-direction: column; }
+    .layer-step + .layer-step { margin-left: 0; margin-top: 6px; }
+    .tier-grid { grid-template-columns: 1fr; }
+    .aux-head { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>美股暴跌预警 <span class="mast-tag">三层趋势雷达</span></h1>
+      <div class="sub">主层：三层趋势跟踪 · 辅助：九信号基本面风险分 · 快照 <span id="updTime">—</span> · 非实时行情</div>
+    </div>
+    <div class="mast-right">
+      <span class="src-badge"><span class="live-dot"></span> 快照模式</span>
+      <a class="ghost-btn" href="backtest.html" style="text-decoration:none">历史回测</a>
+      <a class="ghost-btn" href="technical.html" style="text-decoration:none">技术分析</a>
+      <button class="ghost-btn" id="themeBtn" type="button">主题：自动</button>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="页面导航">
+    <a href="#overview">三层总览</a>
+    <a href="#conditions">七条件</a>
+    <a href="#tiers">层级动作</a>
+    <a href="#validation">历史验证</a>
+    <a href="#auxiliary">辅助风险分</a>
+    <a href="#method">方法与风险预算</a>
+    <a href="backtest.html">历史回测</a>
+    <a href="technical.html">技术分析</a>
+  </nav>
+
+  <div class="demo-banner" role="note">
+    <strong>主层已切换为“三层趋势跟踪”。</strong>当前快照 <span id="bannerDate">—</span>：先看顶部层级与七条件；原九信号基本面风险分移到页面下方，作为辅助背景。
+    所有读数均为快照，非实时行情，不构成投资建议。
+  </div>
+
+  <!-- ================= 三层总览 ================= -->
+  <section id="overview" class="report-section">
+    <div class="card layer-hero" id="layerHero">
+      <div class="layer-current">
+        <div class="eyebrow">当前层级</div>
+        <div class="layer-tier" id="layerTier">警告层</div>
+        <div class="layer-score"><span id="layerScore">5</span><small>/7 条件</small></div>
+        <div class="layer-sub" id="layerSub">放量确认：未触发（1.03×）</div>
+        <div class="layer-note">快照 <span id="layerDate">—</span> · 非实时行情</div>
+      </div>
+      <div class="layer-right">
+        <div class="eyebrow">三层跟踪</div>
+        <div class="layer-ladder" id="layerLadder">
+          <div class="layer-step" data-tier="observe">
+            <div class="ls-num">01</div>
+            <div class="ls-title">观察层</div>
+            <div class="ls-rule">条件 ≥4/7</div>
+          </div>
+          <div class="layer-step" data-tier="warn">
+            <div class="ls-num">02</div>
+            <div class="ls-title">警告层</div>
+            <div class="ls-rule">条件 ≥5/7</div>
+          </div>
+          <div class="layer-step" data-tier="confirm">
+            <div class="ls-num">03</div>
+            <div class="ls-title">确认层</div>
+            <div class="ls-rule">≥5/7 + 放量</div>
+          </div>
+        </div>
+        <p class="layer-summary" id="layerSummary">加载中…</p>
+        <div class="layer-tags" id="layerTags"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KPI ================= -->
+  <section class="kpis" id="layerKpis" aria-label="三层跟踪核心指标"></section>
+
+  <!-- ================= 七条件 ================= -->
+  <section id="conditions" class="report-section">
+    <div class="section-head">
+      <h2>七条件跟踪</h2>
+      <p class="cap">主层只跟踪这 7 个趋势 / 波动 / 动量条件；放量单独作为确认层</p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>逐项读数</h2>
+          <p class="cap">分位 = 当前值在扩展窗口中的百分位；低分位条件取后 20%，高分位条件取前 20%</p>
+        </div>
+      </div>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig" id="conditionTable">
+          <thead>
+            <tr>
+              <th>条件</th><th>类型</th><th>当前读数</th><th>分位</th>
+              <th>阈值</th><th>状态</th><th>说明</th>
+            </tr>
+          </thead>
+          <tbody id="conditionRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" id="conditionNote" style="margin:10px 0 0">加载中…</p>
+    </div>
+  </section>
+
+  <!-- ================= 层级动作 ================= -->
+  <section id="tiers" class="report-section">
+    <div class="section-head">
+      <h2>三层含义与动作</h2>
+      <p class="cap">层级越高，越应该收紧风险；它不是预测具体跌幅的时点工具</p>
+    </div>
+    <div class="tier-grid" id="tierCards"></div>
+  </section>
+
+  <!-- ================= 历史验证 ================= -->
+  <section id="validation" class="report-section">
+    <div class="section-head">
+      <h2>历史验证</h2>
+      <p class="cap">2017–2026 · 9 次 8% 两周暴跌 · 趋势确认，不是顶部预测</p>
+    </div>
+    <div class="card">
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig" id="profileTable">
+          <thead>
+            <tr>
+              <th>方案</th><th>规则</th><th>预警日/年</th>
+              <th>日胜率</th><th>事件召回</th><th>中位触发回撤</th>
+            </tr>
+          </thead>
+          <tbody id="profileRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        9 次事件里，B（≥5/7）全部覆盖，但 <b>0/9 在峰值前触发</b>：中位触发时市场已从高点下跌约 6%，
+        距峰值 17 个交易日。它是“趋势确认 / 防守减仓”工具，不是顶部预测器。
+      </p>
+      <p class="cap" style="margin-top:8px">
+        <a href="technical.html">查看完整技术分析：单指标、三种组合、暴跌频率 →</a> ·
+        <a href="backtest.html">查看历史回测：危机明细、假阳性 →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 辅助风险分 ================= -->
+  <section id="auxiliary" class="report-section">
+    <div class="section-head">
+      <h2>辅助：九信号基本面风险分</h2>
+      <p class="cap">慢变量 / 信用 / 估值综合 · 作为背景，不作为主层触发</p>
+    </div>
+
+    <div class="card aux-card">
+      <div class="aux-head">
+        <div>
+          <div class="eyebrow">辅助风险分</div>
+          <div class="aux-score"><span id="auxScore">26.3</span><small>/100</small></div>
+          <div class="aux-band" id="auxBand">观察</div>
+        </div>
+        <div class="aux-meter-wrap">
+          <div class="risk-meter" id="auxMeter" role="img" aria-label="辅助风险分 26.3，处于观察区间">
+            <div class="rm-seg rm-calm" style="width:25%"></div>
+            <div class="rm-seg rm-watch" style="width:20%"></div>
+            <div class="rm-seg rm-elev" style="width:20%"></div>
+            <div class="rm-seg rm-alert" style="width:20%"></div>
+            <div class="rm-seg rm-crisis" style="width:15%"></div>
+            <div class="rm-marker" id="auxMarker" style="left:26.3%"><span></span></div>
+          </div>
+          <div class="risk-scale">
+            <span style="left:0%">0 平静</span>
+            <span style="left:25%">25 观察</span>
+            <span style="left:45%">45 关注</span>
+            <span style="left:65%">65 警戒</span>
+            <span style="left:85%">85 危机</span>
+            <span style="left:100%">100</span>
+          </div>
+          <p class="tech-note" style="margin:6px 0 0">0–24 平静 · 25–44 观察 · 45–64 关注 · 65–84 警戒 · 85–100 危机</p>
+        </div>
+      </div>
+
+      <p class="tech-note" id="auxNote" style="margin:6px 0 10px">加载中…</p>
+
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig">
+          <thead>
+            <tr><th>信号</th><th>当前读数（0–100）</th><th>权重</th><th>贡献</th><th>说明</th></tr>
+          </thead>
+          <tbody id="auxRows"></tbody>
+        </table>
+      </div>
+      <p class="tech-note" style="margin:10px 0 0">
+        辅助分由 6 个可回测信号加权（信用 25 · 宽度 20 · 估值 15 · 波动率 15 · 宏观 15 · 利率 10）。
+        杠杆/流动性、情绪、结构性风险没有稳定免费历史，未纳入；主站旧版的 9 信号表因此改为“6 个实算 + 3 个未建模”。
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 方法与风险预算 ================= -->
+  <section id="method" class="report-section">
+    <div class="section-head">
+      <h2>方法与风险预算</h2>
+      <p class="cap">先看主层，再用辅助分做背景；两者分歧时，以主层的风险动作为先</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>主层怎么算</h2>
+          <p class="cap">7 个条件，扩展窗口分位，不使用未来数据</p>
+        </div>
+      </div>
+      <div class="formula-box" style="margin-bottom:10px">
+        <b>观察层：</b>7 个条件中 ≥4 个触发<br>
+        <b>警告层：</b>≥5 个触发<br>
+        <b>确认层：</b>≥5 个触发 + 成交量 &gt;1.5×20 日均量<br>
+        条件分位：低分位条件取后 20%，高分位条件取前 20%。
+      </div>
+      <ul class="tech-list">
+        <li><b>趋势：</b>收盘 &lt;200 日均线、收盘 &lt;50 日均线、周收盘 &lt;30 周均线。</li>
+        <li><b>动量：</b>RSI(14) 后 20%、MACD 柱后 20%。</li>
+        <li><b>波动率：</b>ATR 前 20%、VIX 前 20%。</li>
+        <li><b>确认：</b>成交量 &gt;1.5×20 日均量（单独作为确认层，不计入 7 个条件）。</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>历史边界</h2>
+          <p class="cap">这些数字决定它能做什么、不能做什么</p>
+        </div>
+      </div>
+      <ul class="tech-list">
+        <li><b>能做的：</b>在下跌已经开始后，确认趋势破坏，帮助减仓/收紧风控；B 覆盖 9/9 次样本内事件。</li>
+        <li><b>不能做的：</b>预测顶部。0/9 在峰值前触发，中位触发时已回撤约 6%。</li>
+        <li><b>样本很小：</b>2017–2026 只有 9 次 8% 两周暴跌；三套组合为样本内筛查，胜率应打折看待。</li>
+        <li><b>辅助分的定位：</b>估值/信用/宏观是慢变量；当前辅助分 26.3（观察），与主层 5/7 警告出现分歧，说明技术层先恶化、基本面层尚未确认。</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>风险预算</h2>
+          <p class="cap">层级只是提醒，仓位决定生死</p>
+        </div>
+      </div>
+      <ul class="checklist">
+        <li>单一高波动标的 ≤ 组合 5%。</li>
+        <li>杠杆 ETF 合计 ≤ 10%，预设 −20% 止损。</li>
+        <li>保留 6–12 个月生活费的现金。</li>
+        <li>不用保证金追高，不用短期要用的钱投资。</li>
+        <li>撑不到反弹的仓位，弹性对你没有意义。</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <b>美股暴跌预警 · 三层趋势雷达</b> · 演示站点 · 静态页面（HTML + CSS + JS，零依赖）<br>
+    <b>数据来源与口径：</b>SPY 日线/周线 OHLCV、CBOE VIX/VIX3M、美国财政部收益率、DBnomics/OECD 失业率、Shiller CAPE。
+    当前为 <span id="footerDate">—</span> 快照，非实时行情；历史涨跌幅为近似值。<br>
+    <b>声明：</b>本页不构成投资建议、要约或招揽。历史表现不代表未来收益。投资涉及风险，可能损失全部本金。
+    任何投资决策应结合个人财务状况、风险承受能力与投资期限，并咨询持牌财务顾问。<br>
+    <span style="display:block;margin-top:8px">
+      页面导航：
+      <a href="#overview">三层总览</a> ·
+      <a href="#conditions">七条件</a> ·
+      <a href="#tiers">层级动作</a> ·
+      <a href="#validation">历史验证</a> ·
+      <a href="#auxiliary">辅助风险分</a> ·
+      <a href="#method">方法</a> ·
+      <a href="backtest.html">历史回测</a> ·
+      <a href="technical.html">技术分析</a>
+    </span>
+  </footer>
+</div>
+
+<noscript>
+  <div style="max-width:1140px;margin:12px auto;padding:12px;border:1px solid #d03b3b;border-radius:8px;color:#d03b3b">
+    三层跟踪与辅助分需要启用 JavaScript。
+  </div>
+</noscript>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

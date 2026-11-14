@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>历史回测 · 美股暴跌预警</title>
+<meta name="description" content="2017–2026 美股回撤回测：6 个可计算信号、滚动 3 年分位、5 次 ≥10% 回撤的预警表现。演示与教育用途，不构成投资建议。">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .bt-episodes { min-width: 980px; }
+  .bt-sharp { min-width: 760px; }
+  .bt-fp { min-width: 720px; }
+  .bt-note { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; }
+  .bt-note b { color: var(--ink); }
+  .bt-method-list { margin: 0; padding-left: 1.2em; color: var(--ink-2); font-size: 12.5px; line-height: 1.85; }
+  .bt-method-list li { margin-bottom: 4px; }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>历史回测 <span class="mast-tag">2017–2026</span></h1>
+      <div class="sub">6 个可计算信号 · 滚动 3 年分位 · 数据截至 <span id="btAsOf">—</span> · 不构成投资建议</div>
+    </div>
+    <div class="mast-right">
+      <a class="ghost-btn" href="index.html" style="text-decoration:none">← 返回预警站</a>
+      <button class="ghost-btn" id="themeBtn" type="button">主题：自动</button>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="页面导航">
+    <a href="#bt-summary">结论</a>
+    <a href="#bt-score">评分走势</a>
+    <a href="#bt-episodes">危机明细</a>
+    <a href="#bt-coverage">信号覆盖</a>
+    <a href="#bt-fp">假阳性</a>
+    <a href="#bt-method">方法</a>
+    <a href="technical.html">技术分析</a>
+  </nav>
+
+  <div class="demo-banner" role="note">
+    <strong>回测结论：</strong><span id="btBannerText">加载中…</span>
+  </div>
+
+  <!-- ================= 结论 ================= -->
+  <section id="bt-summary" class="report-section">
+    <div class="section-head">
+      <h2>回测结果</h2>
+      <p class="cap">2017–2026 · ≥10% 回撤为主统计 · 8–10% 回撤单列</p>
+    </div>
+
+    <div class="kpis" id="btKpis" aria-label="回测统计"></div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>一句话结论</h2>
+          <p class="cap">评分是“相对脆弱度”，不是“时点预测”</p>
+        </div>
+      </div>
+      <p id="btConclusion" style="font-size:13.5px;line-height:1.85;color:var(--ink-2);margin:0 0 10px">
+        加载中…
+      </p>
+      <div class="alert-tags" id="btTags"></div>
+    </div>
+  </section>
+
+  <!-- ================= 评分走势 ================= -->
+  <section id="bt-score" class="report-section">
+    <div class="section-head">
+      <h2>评分走势</h2>
+      <p class="cap">阴影 = ≥10% 回撤区间 · 红线 = 关注阈值</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>原始加权分（0–100）</h2>
+          <p class="cap">6 信号加权 · 5 日平滑 · 绝对分数在多数危机前只有 20–40</p>
+        </div>
+      </div>
+      <div class="legend" aria-label="图例">
+        <span class="k"><span class="kbox" style="background:var(--s1)"></span>原始加权分</span>
+        <span class="k"><span class="kbox" style="background:rgba(208,59,59,.14);border:1px solid var(--crit)"></span>≥10% 回撤区间</span>
+      </div>
+      <div class="chartbox" id="btChartRaw"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>滚动 3 年分位（0–100）</h2>
+          <p class="cap">当前风险分在过去 3 年中的相对位置 · 80 以上为“相对高位”</p>
+        </div>
+      </div>
+      <div class="legend" aria-label="图例">
+        <span class="k"><span class="kbox" style="background:var(--s2)"></span>滚动分位</span>
+        <span class="k"><span class="kbox" style="background:rgba(208,59,59,.14);border:1px solid var(--crit)"></span>≥10% 回撤区间</span>
+      </div>
+      <div class="chartbox" id="btChartPct"></div>
+    </div>
+  </section>
+
+  <!-- ================= 危机明细 ================= -->
+  <section id="bt-episodes" class="report-section">
+    <div class="section-head">
+      <h2>危机明细</h2>
+      <p class="cap">T-30 / T-10 = 峰值前 30 / 10 个交易日</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>≥10% 回撤 · 主统计</h2>
+          <p class="cap">判定规则见页面底部“方法”；分位为滚动 3 年分位</p>
+        </div>
+      </div>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig bt-episodes">
+          <thead>
+            <tr>
+              <th>峰值</th><th>谷底</th><th>回撤</th>
+              <th>原始分 T-30</th><th>原始分 T-10</th>
+              <th>分位 T-30</th><th>分位 T-10</th>
+              <th>判定</th><th>说明</th>
+            </tr>
+          </thead>
+          <tbody id="btMajorRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>8–10% 回撤 · 不纳入主统计</h2>
+          <p class="cap">短促回撤，单独观察，避免把小跌也算成“危机”</p>
+        </div>
+      </div>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig bt-sharp">
+          <thead>
+            <tr>
+              <th>峰值</th><th>谷底</th><th>回撤</th>
+              <th>分位 T-30</th><th>分位 T-10</th><th>判定</th><th>说明</th>
+            </tr>
+          </thead>
+          <tbody id="btSharpRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>2022 为什么没抓到？</h2>
+          <p class="cap">峰值前 30 天（2021-11-19）的信号构成</p>
+        </div>
+      </div>
+      <p class="bt-note" style="margin-top:0">
+        2022 年的回撤由通胀与美联储转鹰驱动，但模型在峰值前几乎只有估值信号在亮：
+      </p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:860px">
+          <thead>
+            <tr><th>信号</th><th>读数（0–100）</th><th>权重</th><th>贡献</th><th>为什么低</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>估值</td><td>99</td><td>15</td><td>14.9</td><td>CAPE 处于历史高位，唯一明显预警</td></tr>
+            <tr><td>宽度</td><td>37</td><td>20</td><td>7.4</td><td>等权/市值权走弱，但未崩溃</td></tr>
+            <tr><td>信用</td><td>8</td><td>25</td><td>2.0</td><td>HYG/LQD 接近高位，信用市场没有压力</td></tr>
+            <tr><td>波动率</td><td>14</td><td>15</td><td>2.1</td><td>VIX 低、期限结构正常</td></tr>
+            <tr><td>利率</td><td>0</td><td>10</td><td>0.0</td><td>实际利率仍深度为负，2s10s 未倒挂；飙升发生在峰值之后</td></tr>
+            <tr><td>宏观</td><td>0</td><td>15</td><td>0.0</td><td>失业率低，Sahm 规则未触发</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bt-note" style="margin-bottom:0">
+        贡献合计约 26，5 日平滑后综合分 22.7，远低于 45 的关注线。2022 是“通胀/政策”驱动的估值杀，
+        不是信用/流动性危机；模型的信号集偏信用与流动性，缺少通胀、美联储政策预期和盈利修正。
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 信号覆盖 ================= -->
+  <section id="bt-coverage" class="report-section">
+    <div class="section-head">
+      <h2>信号覆盖</h2>
+      <p class="cap">主站九信号中，只有 6 个有稳定的免费历史序列</p>
+    </div>
+
+    <div class="card">
+      <p class="bt-note" style="margin-top:0">
+        回测版权重根据可计算信号重新分配：信用 25、宽度 20、估值 15、波动率 15、宏观 15、利率 10。
+        代理信号与真实 HY OAS、真实市场宽度、NFCI 存在差异，因此回测结论应理解为“框架能不能给出相对提示”，
+        而不是“实盘收益”。
+      </p>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig">
+          <thead>
+            <tr><th>主站信号</th><th>回测处理</th><th>代理 / 数据</th><th>权重</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>信用利差</td><td>纳入</td><td>HYG/LQD 相对 200 日均线 + 3 个月动量</td><td class="num">25</td></tr>
+            <tr><td>市场宽度</td><td>纳入</td><td>RSP/SPY（等权/市值权）相对 200 日均线 + 3 个月动量</td><td class="num">20</td></tr>
+            <tr><td>估值</td><td>纳入</td><td>Shiller CAPE 20 年滚动分位（月度，滞后一月）</td><td class="num">15</td></tr>
+            <tr><td>波动率</td><td>纳入</td><td>VIX 2 年分位 + VIX/VIX3M 期限结构</td><td class="num">15</td></tr>
+            <tr><td>利率</td><td>纳入</td><td>10Y TIPS 实际利率 3 个月变化 + 2s10s</td><td class="num">10</td></tr>
+            <tr><td>宏观</td><td>纳入</td><td>美国月度失业率 12 个月变化（Sahm 思路）</td><td class="num">15</td></tr>
+            <tr><td>杠杆与流动性</td><td>未纳入</td><td>NFCI 免费历史不可得</td><td class="num">—</td></tr>
+            <tr><td>情绪与资金</td><td>未纳入</td><td>没有可靠的免费历史序列</td><td class="num">—</td></tr>
+            <tr><td>结构性风险</td><td>未纳入</td><td>难以量化，无法回测</td><td class="num">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 假阳性 ================= -->
+  <section id="bt-fp" class="report-section">
+    <div class="section-head">
+      <h2>预警错误 / 假阳性</h2>
+      <p class="cap">预警之后没发生大跌的次数；分位阈值、持续天数、回撤幅度都会改变答案</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>滚动分位预警：命中与误报</h2>
+          <p class="cap">预警 = 分位 ≥阈值持续 ≥10 个交易日 · 未来 6 个月出现 ≥10% / ≥8% 回撤为命中</p>
+        </div>
+      </div>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:900px">
+          <thead>
+            <tr>
+              <th>预警定义</th><th>事前预警</th>
+              <th>命中 ≥10%</th><th>误报 ≥10%</th><th>误报率</th>
+              <th>命中 ≥8%</th><th>误报 ≥8%</th><th>误报率</th>
+              <th>事后高位</th>
+            </tr>
+          </thead>
+          <tbody id="btWarnRows"></tbody>
+        </table>
+      </div>
+      <p class="bt-note" id="btWarnNote" style="margin:10px 0 0">加载中…</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>分位 ≥80 的预警明细</h2>
+          <p class="cap">含命中、误报、事后高位；事后高位发生在已知回撤中，不计入误报率</p>
+        </div>
+      </div>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig" style="min-width:820px">
+          <thead>
+            <tr><th>预警开始</th><th>结束</th><th>最高分位</th><th>起点距高点</th><th>未来 6 个月最大回撤</th><th>结果</th></tr>
+          </thead>
+          <tbody id="btWarnDetailRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>原始分 ≥60 的高位读数</h2>
+          <p class="cap">更严格的绝对分定义：只统计持续 ≥20 个交易日的高位读数</p>
+        </div>
+      </div>
+      <p class="bt-note" id="btFpNote" style="margin-top:0">加载中…</p>
+      <p class="scroll-hint">表格可左右滑动 →</p>
+      <div class="tblwrap">
+        <table class="sig bt-fp">
+          <thead>
+            <tr><th>开始</th><th>结束</th><th>持续交易日</th><th>最高原始分</th><th>未来 6 个月最大回撤</th></tr>
+          </thead>
+          <tbody id="btFpRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 方法 ================= -->
+  <section id="bt-method" class="report-section">
+    <div class="section-head">
+      <h2>方法与数据</h2>
+      <p class="cap">回测是历史模拟，不是实盘；样本只有 5 次 ≥10% 回撤，统计意义有限</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>评分与判定</h2>
+          <p class="cap">所有信号只用当日及以前的数据；月度数据滞后一个月</p>
+        </div>
+      </div>
+      <div class="formula-box" style="margin-bottom:12px">
+        <b>原始加权分</b> = Σ（信号状态分 × 权重）÷ 100<br>
+        权重：信用 25 · 宽度 20 · 估值 15 · 波动率 15 · 宏观 15 · 利率 10<br>
+        <b>滚动 3 年分位</b> = 当前原始分在过去 756 个交易日中的百分位
+      </div>
+      <ul class="bt-method-list">
+        <li><b>提前预警：</b>T-30 分位 ≥ 80，或 T-10 分位 ≥ 80 且 T-30 分位 ≥ 65。</li>
+        <li><b>部分预警：</b>T-30 分位 ≥ 65，或 T-10 分位 ≥ 75，但未达到提前预警。</li>
+        <li><b>同步确认：</b>峰值后 10 个交易日内，分位最高值 ≥ 80。</li>
+        <li><b>未捕捉：</b>以上都不满足。</li>
+        <li><b>8–10% 回撤：</b>不参与上述判定，单独列出，避免把小跌也算成“危机”。</li>
+        <li><b>回撤定义：</b>SPY 收盘价从历史高点的回撤 ≥ 10%（主统计）或 8–10%（单列）。</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>数据源</h2>
+          <p class="cap">均为公开、无需 API Key 的数据源</p>
+        </div>
+      </div>
+      <div class="tblwrap">
+        <table class="sig">
+          <thead>
+            <tr><th>数据</th><th>来源</th><th>用途</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>SPY / RSP / HYG / LQD</td><td>Nasdaq API（约 10 年日线）</td><td>回撤、宽度代理、信用代理</td></tr>
+            <tr><td>VIX / VIX3M</td><td>CBOE 历史 CSV</td><td>波动率与期限结构</td></tr>
+            <tr><td>2Y / 10Y 名义收益率</td><td>美国财政部 Daily Treasury Par Yield Curve</td><td>2s10s</td></tr>
+            <tr><td>10Y TIPS 实际收益率</td><td>美国财政部 Daily Treasury Real Yield Curve</td><td>实际利率变化</td></tr>
+            <tr><td>美国月度失业率</td><td>DBnomics / OECD（季调，15 岁以上）</td><td>宏观 / Sahm 思路</td></tr>
+            <tr><td>Shiller CAPE</td><td>multpl.com 月度表</td><td>估值分位</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>局限</h2>
+          <p class="cap">这些限制会直接影响“能不能预测”的答案</p>
+        </div>
+      </div>
+      <ul class="bt-method-list">
+        <li><b>代理误差：</b>HYG/LQD 不是 HY OAS，RSP/SPY 不是真实宽度；信用和宽度信号会滞后或失真。</li>
+        <li><b>信号缺失：</b>杠杆/流动性（NFCI）、情绪、结构性风险没有纳入，模型对流动性冲击的敏感度偏低。</li>
+        <li><b>样本很小：</b>2017–2026 只有 5 次 ≥10% 回撤，任何命中率都可能是运气。</li>
+        <li><b>事后规则：</b>判定阈值（80/65 等）是回测后设定的，存在一定过拟合风险；不要把它当成实盘策略。</li>
+        <li><b>不是交易策略：</b>回测没有考虑交易成本、滑点、税费，也没有给出买卖建议。</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <b>美股暴跌预警 · 历史回测</b> · 演示站点 · 静态页面（HTML + CSS + JS，零依赖）<br>
+    <b>声明：</b>本页是历史模拟与教育用途，不构成投资建议、要约或招揽。历史表现不代表未来收益。投资涉及风险，可能损失全部本金。<br>
+    <span style="display:block;margin-top:8px">
+      <a href="index.html">← 返回预警总览</a> ·
+      <a href="#bt-summary">结论</a> ·
+      <a href="#bt-score">评分走势</a> ·
+      <a href="#bt-episodes">危机明细</a> ·
+      <a href="#bt-method">方法</a> ·
+      <a href="technical.html">技术分析</a>
+    </span>
+  </footer>
+</div>
+
+<div id="tt" aria-hidden="true"></div>
+
+<noscript>
+  <div style="max-width:1140px;margin:12px auto;padding:12px;border:1px solid #d03b3b;border-radius:8px;color:#d03b3b">
+    图表与回测明细需要启用 JavaScript。
+  </div>
+</noscript>
+
+<script src="assets/backtest-data.js"></script>
+<script src="assets/backtest.js"></script>
+</body>
+</html>
