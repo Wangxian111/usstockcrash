@@ -18,7 +18,7 @@ F:\Claudeproject\USStockcrashedOfficial\index.html
 2. 依次运行 `build_backtest.py` → `build_technical.py` → `build_site.py` → `build_en.py`；
 3. 有变更时提交并推送，然后请求 GitHub Pages 重新构建。
 
-- 非交易日数据不变，任务正常结束，不会产生空提交。
+- 非交易日行情不变，页面结论保持不变；生成时间戳仍会刷新，因此通常每天会产生一个很小的提交。
 - 手动触发：仓库 Actions → **Daily data update** → **Run workflow**。
 - GitHub 的 cron 在整点可能有几分钟到半小时的排队延迟，属于平台行为。
 - 若行情数据超过 7 天未更新，任务会给出 warning 提示上游数据源异常。
