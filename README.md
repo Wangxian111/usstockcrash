@@ -10,6 +10,19 @@
 F:\Claudeproject\USStockcrashedOfficial\index.html
 ```
 
+## 自动更新
+
+`.github/workflows/daily-update.yml` 每天北京时间 08:00（UTC 00:00）自动运行：
+
+1. 重新抓取行情与宏观数据（`REFRESH_DATA=1`；单个数据源失败时回退到 `data/raw/` 缓存，不会整体失败）；
+2. 依次运行 `build_backtest.py` → `build_technical.py` → `build_site.py` → `build_en.py`；
+3. 有变更时提交并推送，然后请求 GitHub Pages 重新构建。
+
+- 非交易日数据不变，任务正常结束，不会产生空提交。
+- 手动触发：仓库 Actions → **Daily data update** → **Run workflow**。
+- GitHub 的 cron 在整点可能有几分钟到半小时的排队延迟，属于平台行为。
+- 若行情数据超过 7 天未更新，任务会给出 warning 提示上游数据源异常。
+
 ## 目录
 
 ```text
@@ -39,7 +52,10 @@ USStockcrashedOfficial/
 ├─ scripts/
 │  ├─ build_backtest.py    # 回测数据构建脚本
 │  ├─ build_technical.py   # 技术分析构建脚本
+│  ├─ build_site.py        # 重算首页 PAGE_DATA（7 条件 + 辅助分）
 │  └─ build_en.py          # 生成英文版 assets（文案替换，不重新计算数据）
+├─ .github/workflows/
+│  └─ daily-update.yml     # 每天北京时间 08:00 自动更新并发布
 └─ README.md
 ```
 
@@ -58,6 +74,7 @@ USStockcrashedOfficial/
 ```powershell
 python scripts\build_backtest.py
 python scripts\build_technical.py
+python scripts\build_site.py      # 重算中英文首页 PAGE_DATA 与结论段落
 python scripts\build_en.py        # 重新生成 en/assets/*.js
 ```
 
@@ -91,7 +108,7 @@ GitHub Sponsors 与 Ko-fi 账户尚未开通，因此英文页目前**没有**�
 - **七条件跟踪**：收盘<200DMA、收盘<50DMA、RSI 后 20%、周收盘<30WMA、ATR 前 20%、VIX 前 20%、MACD 柱后 20%；逐项显示当前读数、分位、阈值、触发状态。
 - **层级动作**：观察层（≥4/7）、警告层（≥5/7）、确认层（≥5/7+放量）分别对应的风险动作。
 - **历史验证**：A 低频保守 / B 均衡（当前）/ C 高频灵敏 / B+放量确认 的胜率、召回、触发回撤。
-- **辅助风险分**：6 个可回测信号（信用、宽度、估值、波动率、利率、宏观）的分数、权重、贡献；3 个未建模信号单列。当前 26.3/100（观察）。
+- **辅助风险分**：6 个可回测信号（信用、宽度、估值、波动率、利率、宏观）的分数、权重、贡献；3 个未建模信号单列。首页快照由 `scripts/build_site.py` 按最新数据重算。
 - **方法与风险预算**：主层公式、历史边界、仓位与现金约束。
 - **研究页面**：`backtest.html`（危机明细、假阳性）、`technical.html`（单指标、三种组合、暴跌频率、技术分析）。
 
@@ -170,13 +187,13 @@ python scripts/build_technical.py     # 生成 data/technical.json + assets/tech
 
 当前首页使用 `assets/app.js` 顶部的 `PAGE_DATA` 内嵌快照，保证 `file://` 直接打开也能运行（浏览器对本地 `fetch` 有 CORS 限制）。
 
-接入实时数据时：
+`scripts/build_site.py` 会读取最新行情与 `data/backtest_score_daily.csv`，自动重写：
 
-1. 替换 `PAGE_DATA.layer.conditions` 的当前读数、分位与 `active` 状态；
-2. 替换 `layer.score`、`layer.tier`、`layer.confirmed`、`layer.volumeRatio`；
-3. 替换 `PAGE_DATA.auxiliary` 的 6 个信号读数、权重与贡献；
-4. 修改 `asOf` 为数据截止日；
-5. 如需自动化，可复用 `scripts/build_technical.py` 的指标计算，把最新值写入 `PAGE_DATA`。
+- `PAGE_DATA.layer`：7 个条件的当前读数、分位、`active`、层级、放量与摘要；
+- `PAGE_DATA.auxiliary`：6 个信号的读数、权重、贡献与说明；
+- `asOf` 以及中英文首页「辅助分的定位」结论段落。
+
+因此日常更新不需要手工改数，运行上面的四步脚本或等定时任务即可。
 
 ### 主层口径
 
@@ -202,7 +219,7 @@ python scripts/build_technical.py     # 生成 data/technical.json + assets/tech
 ```
 
 区间：0–24 平静，25–44 观察，45–64 关注，65–84 警戒，85–100 危机。  
-当前辅助分 26.3（观察），主要贡献来自估值 99.6 分位（14.9/15）；杠杆/流动性、情绪、结构性风险未建模。
+辅助分的当前读数与主要贡献由 `scripts/build_site.py` 自动写入首页；杠杆/流动性、情绪、结构性风险未建模。
 
 ### 区间
 

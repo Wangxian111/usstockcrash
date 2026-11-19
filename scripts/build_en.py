@@ -9,7 +9,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(r"F:\Claudeproject\USStockcrashedOfficial")
+ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "assets"
 DST = ROOT / "en" / "assets"
 DST.mkdir(parents=True, exist_ok=True)

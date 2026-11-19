@@ -1,8 +1,8 @@
 const TECHNICAL_DATA = {
   "meta": {
-    "generatedAt": "2026-11-12 10:05",
+    "generatedAt": "2026-11-19 23:07",
     "windowStart": "2017-11-01",
-    "windowEnd": "2026-05-12",
+    "windowEnd": "2026-05-21",
     "horizonDays": 126,
     "drawdownThreshold": -0.1,
     "baseRate": 23.4,
@@ -20,18 +20,6 @@ const TECHNICAL_DATA = {
   },
   "indicators": [
     {
-      "name": "ATR percentile > 80% (high volatility)",
-      "kind": "Volatility",
-      "signalDays": 124,
-      "triggers": 23,
-      "precision": 37.1,
-      "lift": 1.63,
-      "recall": 8.2,
-      "fpr": 4.3,
-      "avgFwdDd": -8.6,
-      "medianFwdDd": -5.9
-    },
-    {
       "name": "RSI(14) < 40 (weakening)",
       "kind": "Momentum",
       "signalDays": 39,
@@ -46,14 +34,26 @@ const TECHNICAL_DATA = {
     {
       "name": "Weekly Bollinger width < 20th percentile",
       "kind": "Weekly",
-      "signalDays": 395,
+      "signalDays": 390,
       "triggers": 20,
-      "precision": 29.9,
-      "lift": 1.31,
+      "precision": 30.3,
+      "lift": 1.33,
       "recall": 21.1,
-      "fpr": 15.1,
-      "avgFwdDd": -8.8,
-      "medianFwdDd": -6.7
+      "fpr": 14.9,
+      "avgFwdDd": -8.9,
+      "medianFwdDd": -6.8
+    },
+    {
+      "name": "ATR percentile > 80% (high volatility)",
+      "kind": "Volatility",
+      "signalDays": 162,
+      "triggers": 30,
+      "precision": 28.4,
+      "lift": 1.25,
+      "recall": 8.2,
+      "fpr": 6.3,
+      "avgFwdDd": -6.8,
+      "medianFwdDd": -2.9
     },
     {
       "name": "Close < 50-day MA",
@@ -68,18 +68,6 @@ const TECHNICAL_DATA = {
       "medianFwdDd": -4.4
     },
     {
-      "name": "Gap down (daily)",
-      "kind": "Candlestick",
-      "signalDays": 201,
-      "triggers": 181,
-      "precision": 25.9,
-      "lift": 1.14,
-      "recall": 9.3,
-      "fpr": 8.1,
-      "avgFwdDd": -7.4,
-      "medianFwdDd": -3.9
-    },
-    {
       "name": "Bearish engulfing (daily)",
       "kind": "Candlestick",
       "signalDays": 58,
@@ -92,52 +80,64 @@ const TECHNICAL_DATA = {
       "medianFwdDd": -4.0
     },
     {
+      "name": "Gap down (daily)",
+      "kind": "Candlestick",
+      "signalDays": 202,
+      "triggers": 182,
+      "precision": 25.7,
+      "lift": 1.13,
+      "recall": 9.3,
+      "fpr": 8.2,
+      "avgFwdDd": -7.4,
+      "medianFwdDd": -3.9
+    },
+    {
       "name": "Volume > 1.5x 20-day average",
       "kind": "Volume",
-      "signalDays": 108,
-      "triggers": 76,
-      "precision": 25.0,
-      "lift": 1.1,
+      "signalDays": 107,
+      "triggers": 75,
+      "precision": 25.2,
+      "lift": 1.11,
       "recall": 4.8,
       "fpr": 4.4,
-      "avgFwdDd": -6.7,
+      "avgFwdDd": -6.8,
       "medianFwdDd": -3.0
     },
     {
       "name": "Weekly MACD line < signal line",
       "kind": "Weekly",
-      "signalDays": 553,
-      "triggers": 41,
-      "precision": 24.2,
-      "lift": 1.06,
+      "signalDays": 539,
+      "triggers": 42,
+      "precision": 24.9,
+      "lift": 1.09,
       "recall": 24.0,
-      "fpr": 22.9,
-      "avgFwdDd": -7.1,
-      "medianFwdDd": -4.0
+      "fpr": 22.1,
+      "avgFwdDd": -7.3,
+      "medianFwdDd": -4.2
     },
     {
       "name": "MACD line < signal line",
       "kind": "Momentum",
-      "signalDays": 708,
-      "triggers": 98,
-      "precision": 23.4,
+      "signalDays": 711,
+      "triggers": 99,
+      "precision": 23.3,
       "lift": 1.03,
       "recall": 29.7,
-      "fpr": 29.6,
-      "avgFwdDd": -6.6,
+      "fpr": 29.8,
+      "avgFwdDd": -6.5,
       "medianFwdDd": -3.3
     },
     {
       "name": "Bollinger width < 20th percentile (squeeze)",
       "kind": "Volatility",
-      "signalDays": 408,
+      "signalDays": 407,
       "triggers": 44,
-      "precision": 20.8,
+      "precision": 20.9,
       "lift": 0.92,
       "recall": 15.2,
-      "fpr": 17.7,
+      "fpr": 17.6,
       "avgFwdDd": -6.5,
-      "medianFwdDd": -3.0
+      "medianFwdDd": -3.1
     },
     {
       "name": "Outside-down day (daily)",
@@ -155,37 +155,37 @@ const TECHNICAL_DATA = {
       "name": "RSI(14) > 70 (overbought)",
       "kind": "Overbought",
       "signalDays": 227,
-      "triggers": 62,
+      "triggers": 61,
       "precision": 16.7,
       "lift": 0.74,
       "recall": 6.8,
       "fpr": 10.3,
       "avgFwdDd": -6.6,
-      "medianFwdDd": -2.1
+      "medianFwdDd": -2.2
     },
     {
       "name": "Close > upper Bollinger band",
       "kind": "Overbought",
-      "signalDays": 98,
-      "triggers": 60,
-      "precision": 14.3,
-      "lift": 0.63,
+      "signalDays": 94,
+      "triggers": 58,
+      "precision": 14.9,
+      "lift": 0.65,
       "recall": 2.5,
-      "fpr": 4.6,
-      "avgFwdDd": -5.8,
-      "medianFwdDd": -2.9
+      "fpr": 4.4,
+      "avgFwdDd": -5.9,
+      "medianFwdDd": -3.3
     },
     {
       "name": "Weekly RSI(14) > 70 (overbought)",
       "kind": "Weekly",
-      "signalDays": 438,
-      "triggers": 17,
-      "precision": 12.3,
-      "lift": 0.54,
+      "signalDays": 456,
+      "triggers": 15,
+      "precision": 11.8,
+      "lift": 0.52,
       "recall": 9.7,
-      "fpr": 21.0,
-      "avgFwdDd": -5.3,
-      "medianFwdDd": -2.0
+      "fpr": 22.0,
+      "avgFwdDd": -5.1,
+      "medianFwdDd": -1.9
     },
     {
       "name": "50-day MA < 200-day MA (death cross)",
@@ -204,14 +204,14 @@ const TECHNICAL_DATA = {
     {
       "name": "ATR percentile > 80% (high volatility)",
       "kind": "Volatility",
-      "signalDays": 470,
-      "triggers": 22,
-      "precision": 41.1,
-      "lift": 1.75,
+      "signalDays": 508,
+      "triggers": 29,
+      "precision": 38.0,
+      "lift": 1.62,
       "recall": 34.5,
-      "fpr": 15.1,
-      "avgFwdDd": -7.9,
-      "medianFwdDd": -5.8
+      "fpr": 17.2,
+      "avgFwdDd": -7.4,
+      "medianFwdDd": -4.8
     },
     {
       "name": "Close < 200-day MA",
@@ -252,14 +252,14 @@ const TECHNICAL_DATA = {
     {
       "name": "Volume > 1.5x 20-day average",
       "kind": "Volume",
-      "signalDays": 181,
-      "triggers": 114,
-      "precision": 32.0,
-      "lift": 1.37,
+      "signalDays": 180,
+      "triggers": 113,
+      "precision": 32.2,
+      "lift": 1.38,
       "recall": 10.4,
       "fpr": 6.7,
       "avgFwdDd": -7.6,
-      "medianFwdDd": -3.8
+      "medianFwdDd": -3.9
     },
     {
       "name": "Close < 50-day MA",
@@ -276,46 +276,46 @@ const TECHNICAL_DATA = {
     {
       "name": "Weekly MACD line < signal line",
       "kind": "Weekly",
-      "signalDays": 1044,
-      "triggers": 22,
-      "precision": 28.3,
-      "lift": 1.21,
+      "signalDays": 1030,
+      "triggers": 23,
+      "precision": 28.6,
+      "lift": 1.22,
       "recall": 52.8,
-      "fpr": 41.0,
-      "avgFwdDd": -6.9,
-      "medianFwdDd": -4.3
+      "fpr": 40.2,
+      "avgFwdDd": -7.0,
+      "medianFwdDd": -4.4
     },
     {
       "name": "Weekly Bollinger width < 20th percentile",
       "kind": "Weekly",
-      "signalDays": 526,
+      "signalDays": 521,
       "triggers": 15,
-      "precision": 27.0,
-      "lift": 1.15,
+      "precision": 27.3,
+      "lift": 1.16,
       "recall": 25.4,
-      "fpr": 21.0,
-      "avgFwdDd": -7.6,
-      "medianFwdDd": -5.0
+      "fpr": 20.7,
+      "avgFwdDd": -7.7,
+      "medianFwdDd": -5.1
     },
     {
       "name": "MACD line < signal line",
       "kind": "Momentum",
-      "signalDays": 1128,
-      "triggers": 105,
+      "signalDays": 1131,
+      "triggers": 106,
       "precision": 25.5,
       "lift": 1.09,
       "recall": 51.5,
-      "fpr": 45.9,
+      "fpr": 46.1,
       "avgFwdDd": -6.5,
       "medianFwdDd": -3.8
     },
     {
       "name": "Gap down (daily)",
       "kind": "Candlestick",
-      "signalDays": 365,
-      "triggers": 314,
+      "signalDays": 366,
+      "triggers": 315,
       "precision": 24.9,
-      "lift": 1.07,
+      "lift": 1.06,
       "recall": 16.3,
       "fpr": 15.0,
       "avgFwdDd": -6.6,
@@ -361,7 +361,7 @@ const TECHNICAL_DATA = {
       "name": "RSI(14) > 70 (overbought)",
       "kind": "Overbought",
       "signalDays": 242,
-      "triggers": 65,
+      "triggers": 64,
       "precision": 16.9,
       "lift": 0.72,
       "recall": 7.3,
@@ -372,151 +372,151 @@ const TECHNICAL_DATA = {
     {
       "name": "Bollinger width < 20th percentile (squeeze)",
       "kind": "Volatility",
-      "signalDays": 522,
+      "signalDays": 521,
       "triggers": 57,
       "precision": 16.3,
       "lift": 0.7,
       "recall": 15.2,
-      "fpr": 23.9,
+      "fpr": 23.8,
       "avgFwdDd": -5.9,
       "medianFwdDd": -3.1
     },
     {
       "name": "Close > upper Bollinger band",
       "kind": "Overbought",
-      "signalDays": 116,
-      "triggers": 72,
-      "precision": 14.7,
-      "lift": 0.63,
+      "signalDays": 112,
+      "triggers": 70,
+      "precision": 15.2,
+      "lift": 0.65,
       "recall": 3.0,
-      "fpr": 5.4,
-      "avgFwdDd": -5.8,
-      "medianFwdDd": -3.4
+      "fpr": 5.2,
+      "avgFwdDd": -5.9,
+      "medianFwdDd": -3.5
     },
     {
       "name": "Weekly RSI(14) > 70 (overbought)",
       "kind": "Weekly",
-      "signalDays": 440,
-      "triggers": 17,
-      "precision": 12.3,
-      "lift": 0.52,
+      "signalDays": 458,
+      "triggers": 15,
+      "precision": 11.8,
+      "lift": 0.5,
       "recall": 9.7,
-      "fpr": 21.1,
-      "avgFwdDd": -5.3,
-      "medianFwdDd": -2.0
+      "fpr": 22.1,
+      "avgFwdDd": -5.1,
+      "medianFwdDd": -1.9
     }
   ],
   "nearHighBaseRate": 22.8,
   "models": {
     "fundamental": {
       "top20": {
-        "n": 772,
-        "alerts": 156,
+        "n": 779,
+        "alerts": 157,
         "hits": 19,
         "alertRate": 20.2,
-        "precision": 12.2,
+        "precision": 12.1,
         "precisionCI": [
           7.9,
-          18.2
+          18.1
         ],
         "recall": 12.8,
-        "fpr": 22.0,
-        "auc": 0.348,
-        "baseRate": 19.3,
+        "fpr": 21.9,
+        "auc": 0.355,
+        "baseRate": 19.1,
         "lift": 0.63
       },
       "top10": {
-        "n": 772,
-        "alerts": 79,
-        "hits": 7,
-        "alertRate": 10.2,
-        "precision": 8.9,
+        "n": 779,
+        "alerts": 80,
+        "hits": 8,
+        "alertRate": 10.3,
+        "precision": 10.0,
         "precisionCI": [
-          4.4,
-          17.2
+          5.2,
+          18.5
         ],
-        "recall": 4.7,
-        "fpr": 11.6,
-        "auc": 0.348,
-        "baseRate": 19.3,
-        "lift": 0.46
+        "recall": 5.4,
+        "fpr": 11.4,
+        "auc": 0.355,
+        "baseRate": 19.1,
+        "lift": 0.52
       }
     },
     "technical": {
       "top20": {
-        "n": 755,
-        "alerts": 152,
+        "n": 759,
+        "alerts": 153,
         "hits": 47,
-        "alertRate": 20.1,
-        "precision": 30.9,
+        "alertRate": 20.2,
+        "precision": 30.7,
         "precisionCI": [
-          24.1,
-          38.7
+          24.0,
+          38.4
         ],
         "recall": 31.5,
-        "fpr": 17.3,
-        "auc": 0.522,
-        "baseRate": 19.7,
-        "lift": 1.57
+        "fpr": 17.4,
+        "auc": 0.524,
+        "baseRate": 19.6,
+        "lift": 1.56
       },
       "top10": {
-        "n": 755,
-        "alerts": 77,
-        "hits": 33,
-        "alertRate": 10.2,
-        "precision": 42.9,
+        "n": 759,
+        "alerts": 78,
+        "hits": 32,
+        "alertRate": 10.3,
+        "precision": 41.0,
         "precisionCI": [
-          32.4,
-          54.0
+          30.8,
+          52.1
         ],
-        "recall": 22.1,
-        "fpr": 7.3,
-        "auc": 0.522,
-        "baseRate": 19.7,
-        "lift": 2.17
+        "recall": 21.5,
+        "fpr": 7.5,
+        "auc": 0.524,
+        "baseRate": 19.6,
+        "lift": 2.09
       }
     },
     "combined": {
       "top20": {
-        "n": 755,
-        "alerts": 152,
-        "hits": 41,
-        "alertRate": 20.1,
-        "precision": 27.0,
+        "n": 759,
+        "alerts": 153,
+        "hits": 38,
+        "alertRate": 20.2,
+        "precision": 24.8,
         "precisionCI": [
-          20.5,
-          34.5
+          18.7,
+          32.2
         ],
-        "recall": 27.5,
-        "fpr": 18.3,
-        "auc": 0.482,
-        "baseRate": 19.7,
-        "lift": 1.37
+        "recall": 25.5,
+        "fpr": 18.9,
+        "auc": 0.475,
+        "baseRate": 19.6,
+        "lift": 1.27
       },
       "top10": {
-        "n": 755,
-        "alerts": 77,
-        "hits": 20,
-        "alertRate": 10.2,
-        "precision": 26.0,
+        "n": 759,
+        "alerts": 78,
+        "hits": 18,
+        "alertRate": 10.3,
+        "precision": 23.1,
         "precisionCI": [
-          17.5,
-          36.7
+          15.1,
+          33.6
         ],
-        "recall": 13.4,
-        "fpr": 9.4,
-        "auc": 0.482,
-        "baseRate": 19.7,
-        "lift": 1.32
+        "recall": 12.1,
+        "fpr": 9.8,
+        "auc": 0.475,
+        "baseRate": 19.6,
+        "lift": 1.18
       }
     }
   },
   "rules": {
     "fund_score >= 45": {
-      "n": 950,
+      "n": 957,
       "alerts": 10,
       "hits": 0,
-      "alertRate": 1.1,
+      "alertRate": 1.0,
       "precision": 0.0,
       "precisionCI": [
         -0.0,
@@ -525,40 +525,40 @@ const TECHNICAL_DATA = {
       "recall": 0.0,
       "fpr": 1.3,
       "auc": 0.493,
-      "baseRate": 21.6,
+      "baseRate": 21.4,
       "lift": 0.0
     },
     "fund_pct >= 80": {
-      "n": 950,
-      "alerts": 180,
+      "n": 957,
+      "alerts": 185,
       "hits": 38,
-      "alertRate": 18.9,
-      "precision": 21.1,
+      "alertRate": 19.3,
+      "precision": 20.5,
       "precisionCI": [
-        15.8,
-        27.6
+        15.3,
+        26.9
       ],
       "recall": 18.5,
-      "fpr": 19.1,
-      "auc": 0.497,
-      "baseRate": 21.6,
-      "lift": 0.98
+      "fpr": 19.5,
+      "auc": 0.495,
+      "baseRate": 21.4,
+      "lift": 0.96
     },
     "RSI(14) > 70": {
-      "n": 950,
-      "alerts": 111,
+      "n": 957,
+      "alerts": 113,
       "hits": 18,
-      "alertRate": 11.7,
-      "precision": 16.2,
+      "alertRate": 11.8,
+      "precision": 15.9,
       "precisionCI": [
-        10.5,
-        24.2
+        10.3,
+        23.8
       ],
       "recall": 8.8,
-      "fpr": 12.5,
+      "fpr": 12.6,
       "auc": 0.481,
-      "baseRate": 21.6,
-      "lift": 0.75
+      "baseRate": 21.4,
+      "lift": 0.74
     }
   },
   "stability": {
@@ -569,16 +569,16 @@ const TECHNICAL_DATA = {
     "yearsAboveBase": 2
   },
   "bestIndicator": {
-    "name": "ATR percentile > 80% (high volatility)",
-    "kind": "Volatility",
-    "signalDays": 124,
-    "triggers": 23,
-    "precision": 37.1,
-    "lift": 1.63,
-    "recall": 8.2,
-    "fpr": 4.3,
-    "avgFwdDd": -8.6,
-    "medianFwdDd": -5.9
+    "name": "Weekly Bollinger width < 20th percentile",
+    "kind": "Weekly",
+    "signalDays": 390,
+    "triggers": 20,
+    "precision": 30.3,
+    "lift": 1.33,
+    "recall": 21.1,
+    "fpr": 14.9,
+    "avgFwdDd": -8.9,
+    "medianFwdDd": -6.8
   },
   "bestRule": "fund_pct >= 80",
   "yearly": [
@@ -596,14 +596,14 @@ const TECHNICAL_DATA = {
       "skipped": false,
       "fundamental_precision20": 0.0,
       "fundamental_recall20": 0.0,
-      "fundamental_auc": 0.107,
+      "fundamental_auc": 0.105,
       "fundamental_alerts20": 50,
       "fundamental_precision10": 0.0,
       "fundamental_recall10": 0.0,
       "fundamental_alerts10": 25,
       "technical_precision20": 0.0,
       "technical_recall20": 0.0,
-      "technical_auc": 0.085,
+      "technical_auc": 0.088,
       "technical_alerts20": 50,
       "technical_precision10": 0.0,
       "technical_recall10": 0.0,
@@ -641,24 +641,24 @@ const TECHNICAL_DATA = {
       "skipped": false,
       "fundamental_precision20": 16.3,
       "fundamental_recall20": 12.7,
-      "fundamental_auc": 0.195,
+      "fundamental_auc": 0.191,
       "fundamental_alerts20": 49,
       "fundamental_precision10": 0.0,
       "fundamental_recall10": 0.0,
       "fundamental_alerts10": 25,
       "technical_precision20": 40.8,
       "technical_recall20": 31.7,
-      "technical_auc": 0.712,
+      "technical_auc": 0.715,
       "technical_alerts20": 49,
-      "technical_precision10": 52.0,
-      "technical_recall10": 20.6,
+      "technical_precision10": 48.0,
+      "technical_recall10": 19.0,
       "technical_alerts10": 25,
-      "combined_precision20": 20.4,
-      "combined_recall20": 15.9,
-      "combined_auc": 0.578,
+      "combined_precision20": 18.4,
+      "combined_recall20": 14.3,
+      "combined_auc": 0.563,
       "combined_alerts20": 49,
-      "combined_precision10": 16.0,
-      "combined_recall10": 6.3,
+      "combined_precision10": 12.0,
+      "combined_recall10": 4.8,
       "combined_alerts10": 25,
       "rule45_precision": null,
       "rule45_alerts": 0,
@@ -672,24 +672,24 @@ const TECHNICAL_DATA = {
       "skipped": false,
       "fundamental_precision20": 26.8,
       "fundamental_recall20": 26.8,
-      "fundamental_auc": 0.505,
+      "fundamental_auc": 0.521,
       "fundamental_alerts20": 41,
-      "fundamental_precision10": 33.3,
-      "fundamental_recall10": 17.1,
+      "fundamental_precision10": 38.1,
+      "fundamental_recall10": 19.5,
       "fundamental_alerts10": 21,
       "technical_precision20": 65.9,
       "technical_recall20": 65.9,
-      "technical_auc": 0.927,
+      "technical_auc": 0.928,
       "technical_alerts20": 41,
       "technical_precision10": 95.2,
       "technical_recall10": 48.8,
       "technical_alerts10": 21,
-      "combined_precision20": 75.6,
-      "combined_recall20": 75.6,
-      "combined_auc": 0.951,
+      "combined_precision20": 70.7,
+      "combined_recall20": 70.7,
+      "combined_auc": 0.942,
       "combined_alerts20": 41,
-      "combined_precision10": 76.2,
-      "combined_recall10": 39.0,
+      "combined_precision10": 71.4,
+      "combined_recall10": 36.6,
       "combined_alerts10": 21,
       "rule45_precision": 0.0,
       "rule45_alerts": 7,
@@ -698,49 +698,37 @@ const TECHNICAL_DATA = {
     },
     {
       "year": 2026,
-      "testDays": 77,
+      "testDays": 84,
       "baseRate": 0.0,
       "skipped": false,
       "fundamental_precision20": 0.0,
       "fundamental_recall20": null,
       "fundamental_auc": null,
-      "fundamental_alerts20": 16,
+      "fundamental_alerts20": 17,
       "fundamental_precision10": 0.0,
       "fundamental_recall10": null,
-      "fundamental_alerts10": 8,
+      "fundamental_alerts10": 9,
       "technical_precision20": 0.0,
       "technical_recall20": null,
       "technical_auc": null,
-      "technical_alerts20": 12,
+      "technical_alerts20": 13,
       "technical_precision10": 0.0,
       "technical_recall10": null,
-      "technical_alerts10": 6,
+      "technical_alerts10": 7,
       "combined_precision20": 0.0,
       "combined_recall20": null,
       "combined_auc": null,
-      "combined_alerts20": 12,
+      "combined_alerts20": 13,
       "combined_precision10": 0.0,
       "combined_recall10": null,
-      "combined_alerts10": 6,
+      "combined_alerts10": 7,
       "rule45_precision": null,
       "rule45_alerts": 0,
-      "rule80_precision": null,
-      "rule80_alerts": 0
+      "rule80_precision": 0.0,
+      "rule80_alerts": 5
     }
   ],
   "series": [
-    {
-      "d": "2017-08-25",
-      "close": 244.56,
-      "sma200": 235.37,
-      "dd": -1.3
-    },
-    {
-      "d": "2017-09-01",
-      "close": 247.84,
-      "sma200": 236.1,
-      "dd": -0.0
-    },
     {
       "d": "2017-09-08",
       "close": 246.58,
@@ -3617,9 +3605,15 @@ const TECHNICAL_DATA = {
     },
     {
       "d": "2026-11-13",
-      "close": 752.69,
-      "sma200": 730.71,
-      "dd": -3.4
+      "close": 754.37,
+      "sma200": 731.92,
+      "dd": -3.2
+    },
+    {
+      "d": "2026-11-20",
+      "close": 730.2,
+      "sma200": 732.55,
+      "dd": -6.3
     }
   ]
 };

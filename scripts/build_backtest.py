@@ -25,8 +25,9 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -54,7 +55,12 @@ SESSION.mount(
 )
 
 NASDAQ_SYMBOLS = ["SPY", "RSP", "HYG", "LQD"]
-TREASURY_YEARS = list(range(2015, 2027))
+TREASURY_YEARS = list(range(2015, datetime.now().year + 1))
+
+# REFRESH_DATA=1：忽略 data/raw/ 缓存重新抓取；抓取失败时回退到旧缓存，保证定时任务不会因单个数据源挂掉而整体失败。
+REFRESH = os.environ.get("REFRESH_DATA") == "1"
+TODAY = datetime.now().date()
+NASDAQ_TODATE = (TODAY + timedelta(days=1)).isoformat()
 
 WEIGHTS = {
     "credit": 25,
@@ -77,18 +83,27 @@ def rolling_rank(s: pd.Series, window: int, min_periods: int) -> pd.Series:
 
 def fetch_nasdaq(symbol: str) -> pd.DataFrame:
     cache = RAW / f"nasdaq_{symbol}.csv"
-    if cache.exists():
+    if cache.exists() and not REFRESH:
         df = pd.read_csv(cache)
     else:
-        url = (
-            f"https://api.nasdaq.com/api/quote/{symbol}/historical"
-            f"?assetclass=etf&fromdate=2015-01-01&todate=2026-11-10&limit=9999"
-        )
-        r = SESSION.get(url, headers={**UA, "Accept": "application/json"}, timeout=60)
-        r.raise_for_status()
-        df = pd.DataFrame(r.json()["data"]["tradesTable"]["rows"])
-        df.to_csv(cache, index=False)
-        time.sleep(1.0)
+        try:
+            url = (
+                f"https://api.nasdaq.com/api/quote/{symbol}/historical"
+                f"?assetclass=etf&fromdate=2015-01-01&todate={NASDAQ_TODATE}&limit=9999"
+            )
+            r = SESSION.get(url, headers={**UA, "Accept": "application/json"}, timeout=60)
+            r.raise_for_status()
+            rows = (r.json().get("data") or {}).get("tradesTable", {}).get("rows") or []
+            if len(rows) < 100:
+                raise ValueError(f"unexpected row count: {len(rows)}")
+            df = pd.DataFrame(rows)
+            df.to_csv(cache, index=False)
+            time.sleep(1.0)
+        except Exception as exc:  # noqa: BLE001 - 定时任务要尽量产出结果
+            if not cache.exists():
+                raise
+            print(f"[WARN] nasdaq {symbol} refresh failed ({exc}); using cached {cache.name}")
+            df = pd.read_csv(cache)
     df["date"] = pd.to_datetime(df["date"], format="%m/%d/%Y", errors="coerce")
     for col in ["open", "high", "low", "close", "volume"]:
         if col in df.columns:
@@ -101,14 +116,22 @@ def fetch_nasdaq(symbol: str) -> pd.DataFrame:
 
 def fetch_cboe(name: str) -> pd.Series:
     cache = RAW / f"cboe_{name}.csv"
-    if cache.exists():
+    if cache.exists() and not REFRESH:
         df = pd.read_csv(cache)
     else:
-        url = f"https://cdn.cboe.com/api/global/us_indices/daily_prices/{name}_History.csv"
-        r = SESSION.get(url, headers=UA, timeout=60)
-        r.raise_for_status()
-        cache.write_text(r.text, encoding="utf-8")
-        df = pd.read_csv(io.StringIO(r.text))
+        try:
+            url = f"https://cdn.cboe.com/api/global/us_indices/daily_prices/{name}_History.csv"
+            r = SESSION.get(url, headers=UA, timeout=60)
+            r.raise_for_status()
+            if len(r.text) < 200:
+                raise ValueError("response too short")
+            cache.write_text(r.text, encoding="utf-8")
+            df = pd.read_csv(io.StringIO(r.text))
+        except Exception as exc:  # noqa: BLE001
+            if not cache.exists():
+                raise
+            print(f"[WARN] cboe {name} refresh failed ({exc}); using cached {cache.name}")
+            df = pd.read_csv(cache)
     df["DATE"] = pd.to_datetime(df["DATE"], errors="coerce")
     df["CLOSE"] = pd.to_numeric(df["CLOSE"], errors="coerce")
     return df.dropna(subset=["DATE"]).set_index("DATE")["CLOSE"].sort_index()
@@ -119,24 +142,33 @@ def fetch_treasury(kind: str) -> pd.DataFrame:
     frames = []
     for year in TREASURY_YEARS:
         cache = RAW / f"treasury_{kind}_{year}.csv"
-        if cache.exists():
+        # 历史年份的财政部 CSV 不再变化，日常更新只需重新抓当年文件。
+        refresh = REFRESH and year >= datetime.now().year
+        if cache.exists() and not refresh:
             text = cache.read_text(encoding="utf-8")
         else:
-            if kind == "real":
-                type_ = "daily_treasury_real_yield_curve"
-            else:
-                type_ = "daily_treasury_yield_curve"
-            url = (
-                "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
-                f"daily-treasury-rates.csv/{year}/all?type={type_}&"
-                f"field_tdr_date_value={year}&page&_format=csv"
-            )
-            r = SESSION.get(url, headers=UA, timeout=60)
-            if r.status_code != 200 or len(r.text) < 50:
-                continue
-            text = r.text
-            cache.write_text(text, encoding="utf-8")
-            time.sleep(0.4)
+            try:
+                if kind == "real":
+                    type_ = "daily_treasury_real_yield_curve"
+                else:
+                    type_ = "daily_treasury_yield_curve"
+                url = (
+                    "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+                    f"daily-treasury-rates.csv/{year}/all?type={type_}&"
+                    f"field_tdr_date_value={year}&page&_format=csv"
+                )
+                r = SESSION.get(url, headers=UA, timeout=60)
+                if r.status_code != 200 or len(r.text) < 50:
+                    raise ValueError(f"HTTP {r.status_code}")
+                text = r.text
+                cache.write_text(text, encoding="utf-8")
+                time.sleep(0.4)
+            except Exception as exc:  # noqa: BLE001
+                if not cache.exists():
+                    print(f"[WARN] treasury {kind} {year} unavailable ({exc}); skipped")
+                    continue
+                print(f"[WARN] treasury {kind} {year} refresh failed ({exc}); using cache")
+                text = cache.read_text(encoding="utf-8")
         df = pd.read_csv(io.StringIO(text))
         df.columns = [c.strip().replace("﻿", "") for c in df.columns]
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
@@ -149,28 +181,34 @@ def fetch_treasury(kind: str) -> pd.DataFrame:
 def fetch_unemployment() -> pd.Series:
     """OECD 月度失业率（美国，15 岁以上，总计，季调）。"""
     cache = RAW / "oecd_unemployment_usa.csv"
-    if cache.exists():
+    if cache.exists() and not REFRESH:
         df = pd.read_csv(cache)
     else:
-        base = "https://api.db.nomics.world/v22/series/OECD/DSD_LFS@DF_IALFS_UNE_M"
-        params = {
-            "dimensions": json.dumps({
-                "REF_AREA": ["USA"],
-                "FREQ": ["M"],
-                "MEASURE": ["UNE_LF_M"],
-                "UNIT_MEASURE": ["PT_LF_SUB"],
-                "AGE": ["Y_GE15"],
-                "SEX": ["_T"],
-                "ADJUSTMENT": ["Y"],
-            }),
-            "observations": "1",
-            "limit": "5",
-        }
-        r = SESSION.get(base, params=params, timeout=60)
-        r.raise_for_status()
-        doc = r.json()["series"]["docs"][0]
-        df = pd.DataFrame({"period": doc["period"], "value": doc["value"]})
-        df.to_csv(cache, index=False)
+        try:
+            base = "https://api.db.nomics.world/v22/series/OECD/DSD_LFS@DF_IALFS_UNE_M"
+            params = {
+                "dimensions": json.dumps({
+                    "REF_AREA": ["USA"],
+                    "FREQ": ["M"],
+                    "MEASURE": ["UNE_LF_M"],
+                    "UNIT_MEASURE": ["PT_LF_SUB"],
+                    "AGE": ["Y_GE15"],
+                    "SEX": ["_T"],
+                    "ADJUSTMENT": ["Y"],
+                }),
+                "observations": "1",
+                "limit": "5",
+            }
+            r = SESSION.get(base, params=params, timeout=60)
+            r.raise_for_status()
+            doc = r.json()["series"]["docs"][0]
+            df = pd.DataFrame({"period": doc["period"], "value": doc["value"]})
+            df.to_csv(cache, index=False)
+        except Exception as exc:  # noqa: BLE001
+            if not cache.exists():
+                raise
+            print(f"[WARN] unemployment refresh failed ({exc}); using cached {cache.name}")
+            df = pd.read_csv(cache)
     df["period"] = pd.to_datetime(df["period"], format="%Y-%m", errors="coerce")
     df["value"] = pd.to_numeric(df["value"], errors="coerce")
     return df.dropna(subset=["period"]).set_index("period")["value"].sort_index()
@@ -178,17 +216,25 @@ def fetch_unemployment() -> pd.Series:
 
 def fetch_cape() -> pd.Series:
     cache = RAW / "multpl_cape.csv"
-    if cache.exists():
+    if cache.exists() and not REFRESH:
         df = pd.read_csv(cache)
     else:
-        r = SESSION.get(
-            "https://www.multpl.com/shiller-pe/table/by-month",
-            headers=UA,
-            timeout=60,
-        )
-        r.raise_for_status()
-        df = pd.read_html(io.StringIO(r.text))[0]
-        df.to_csv(cache, index=False)
+        try:
+            r = SESSION.get(
+                "https://www.multpl.com/shiller-pe/table/by-month",
+                headers=UA,
+                timeout=60,
+            )
+            r.raise_for_status()
+            df = pd.read_html(io.StringIO(r.text))[0]
+            if len(df) < 12:
+                raise ValueError("unexpected CAPE table")
+            df.to_csv(cache, index=False)
+        except Exception as exc:  # noqa: BLE001
+            if not cache.exists():
+                raise
+            print(f"[WARN] CAPE refresh failed ({exc}); using cached {cache.name}")
+            df = pd.read_csv(cache)
     df.columns = ["date", "cape"]
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df["cape"] = pd.to_numeric(df["cape"], errors="coerce")
