@@ -1,13 +1,13 @@
 /* ==========================================================================
    US Stock Crash Radar · 3-Layer Trend Dashboard (home)
    Main layer: 7-condition 3-tier tracking; auxiliary: 6-signal fundamental risk score.
-   Data is a 2026-11-18 snapshot, not live quotes.
+   Data is a 2026-11-19 snapshot, not live quotes.
    ========================================================================== */
 
 "use strict";
 
 const PAGE_DATA = {
-  asOf: "2026-11-18",
+  asOf: "2026-11-19",
 
   layer: {
     score: 6,
@@ -15,40 +15,40 @@ const PAGE_DATA = {
     tier: "Warning",
     tone: "warn",
     confirmed: false,
-    volumeRatio: 1.01,
+    volumeRatio: 1.46,
     volumeThreshold: 1.5,
-    summary: "6/7 conditions triggered; 30WMA not triggered; volume at 1.01× is below 1.5×, so the confirmation tier is not established.",
+    summary: "6/7 conditions triggered; 30WMA not triggered; volume at 1.46× is below 1.5×, so the confirmation tier is not established.",
     tags: [
       { text: "Below 200DMA", tone: "warn" },
       { text: "Below 50DMA", tone: "warn" },
-      { text: "ATR 97th pct", tone: "warn" },
+      { text: "ATR 100th pct", tone: "warn" },
       { text: "MACD weakening", tone: "warn" },
-      { text: "RSI 36.6", tone: "mid" },
+      { text: "RSI 31.6", tone: "mid" },
       { text: "VIX elevated", tone: "warn" }
     ],
     conditions: [
-      { name: "Close < 200-day MA", type: "Trend", reading: "−0.3% below 200DMA", percentile: 18, threshold: "Bottom 20%", active: true, note: "Long-term trend broken" },
-      { name: "Close < 50-day MA", type: "Trend", reading: "−4.24% below 50DMA", percentile: 7, threshold: "Bottom 20%", active: true, note: "Short-term trend weakening" },
-      { name: "RSI(14) bottom 20%", type: "Momentum", reading: "RSI 36.6", percentile: 6, threshold: "Bottom 20%", active: true, note: "Momentum on the weak side" },
+      { name: "Close < 200-day MA", type: "Trend", reading: "−2.3% below 200DMA", percentile: 13, threshold: "Bottom 20%", active: true, note: "Long-term trend broken" },
+      { name: "Close < 50-day MA", type: "Trend", reading: "−6.01% below 50DMA", percentile: 4, threshold: "Bottom 20%", active: true, note: "Short-term trend weakening" },
+      { name: "RSI(14) bottom 20%", type: "Momentum", reading: "RSI 31.6", percentile: 2, threshold: "Bottom 20%", active: true, note: "Momentum on the weak side" },
       { name: "Weekly close < 30-week MA", type: "Weekly", reading: "+0.29% above 30WMA", percentile: 22, threshold: "Bottom 20%", active: false, note: "Weekly trend intact" },
-      { name: "ATR top 20%", type: "Volatility", reading: "ATR 97th percentile", percentile: 97, threshold: "Top 20%", active: true, note: "Volatility elevated" },
-      { name: "VIX top 20%", type: "Volatility", reading: "VIX 24.6 (84th pct)", percentile: 84, threshold: "Top 20%", active: true, note: "VIX has reached the high zone" },
-      { name: "MACD histogram bottom 20%", type: "Momentum", reading: "MACD hist −0.29% of price", percentile: 15, threshold: "Bottom 20%", active: true, note: "Momentum turning weaker" }
+      { name: "ATR top 20%", type: "Volatility", reading: "ATR 100th percentile", percentile: 100, threshold: "Top 20%", active: true, note: "Volatility elevated" },
+      { name: "VIX top 20%", type: "Volatility", reading: "VIX 28.4 (92th pct)", percentile: 92, threshold: "Top 20%", active: true, note: "VIX has reached the high zone" },
+      { name: "MACD histogram bottom 20%", type: "Momentum", reading: "MACD hist −0.45% of price", percentile: 8, threshold: "Bottom 20%", active: true, note: "Momentum turning weaker" }
     ]
   },
 
   auxiliary: {
-    score: 27.6,
+    score: 28.5,
     band: "Watch",
     tone: "mid",
-    pct: 51.2,
-    note: "Auxiliary score 27.6 (Watch); the main contribution is valuation at the 99.6th percentile (14.9/15), while credit/breadth/macro are all dark. It diverges from the main layer's 6/7 Warning: the technical layer deteriorated first and the fundamental layer has not confirmed.",
+    pct: 57.4,
+    note: "Auxiliary score 28.5 (Watch); the main contribution is valuation at the 99.6th percentile (14.9/15), while credit/breadth/rates/macro are all dark. It diverges from the main layer's 6/7 Warning: the technical layer deteriorated first and the fundamental layer has not confirmed.",
     signals: [
-      { name: "Credit", value: 16.7, weight: 25, contribution: 4.2, note: "Credit stress low" },
+      { name: "Credit", value: 18.3, weight: 25, contribution: 4.6, note: "Credit stress low" },
       { name: "Breadth", value: 0.0, weight: 20, contribution: 0.0, note: "Equal/cap weight not deteriorating" },
       { name: "Valuation", value: 99.6, weight: 15, contribution: 14.9, note: "CAPE extremely high — main driver" },
-      { name: "Volatility", value: 47.3, weight: 15, contribution: 7.1, note: "VIX/term structure mid-range" },
-      { name: "Rates", value: 26.5, weight: 10, contribution: 2.6, note: "Rate pressure moderate" },
+      { name: "Volatility", value: 57.0, weight: 15, contribution: 8.6, note: "Volatility elevated" },
+      { name: "Rates", value: 24.0, weight: 10, contribution: 2.4, note: "Real rates/curve benign" },
       { name: "Macro", value: 0.0, weight: 15, contribution: 0.0, note: "Unemployment not triggered" },
       { name: "Leverage / liquidity", value: null, weight: null, contribution: null, note: "Not modeled (insufficient free NFCI history)" },
       { name: "Sentiment / flows", value: null, weight: null, contribution: null, note: "Not modeled (no reliable free history)" },

@@ -1,13 +1,13 @@
 /* ==========================================================================
    美股暴跌预警 · 三层趋势雷达（首页）
    主层：7 条件三层跟踪；辅助：6 信号基本面风险分。
-   数据为 2026-11-18 快照，非实时行情。
+   数据为 2026-11-19 快照，非实时行情。
    ========================================================================== */
 
 "use strict";
 
 const PAGE_DATA = {
-  asOf: "2026-11-18",
+  asOf: "2026-11-19",
 
   layer: {
     score: 6,
@@ -15,40 +15,40 @@ const PAGE_DATA = {
     tier: "警告层",
     tone: "warn",
     confirmed: false,
-    volumeRatio: 1.01,
+    volumeRatio: 1.46,
     volumeThreshold: 1.5,
-    summary: "6/7 条件触发；30WMA 未触发；放量 1.01× 低于 1.5×，确认层未成立。",
+    summary: "6/7 条件触发；30WMA 未触发；放量 1.46× 低于 1.5×，确认层未成立。",
     tags: [
       { text: "200DMA 下方", tone: "warn" },
       { text: "50DMA 下方", tone: "warn" },
-      { text: "ATR 97% 分位", tone: "warn" },
+      { text: "ATR 100% 分位", tone: "warn" },
       { text: "MACD 走弱", tone: "warn" },
-      { text: "RSI 36.6", tone: "mid" },
+      { text: "RSI 31.6", tone: "mid" },
       { text: "VIX 高位", tone: "warn" }
     ],
     conditions: [
-      { name: "收盘 < 200 日均线", type: "趋势", reading: "低于 200DMA −0.3%", percentile: 18, threshold: "后 20% 分位", active: true, note: "长期趋势已破坏" },
-      { name: "收盘 < 50 日均线", type: "趋势", reading: "低于 50DMA −4.24%", percentile: 7, threshold: "后 20% 分位", active: true, note: "短期趋势走弱" },
-      { name: "RSI(14) 后 20%", type: "动量", reading: "RSI 36.6", percentile: 6, threshold: "后 20% 分位", active: true, note: "动量偏弱" },
+      { name: "收盘 < 200 日均线", type: "趋势", reading: "低于 200DMA −2.3%", percentile: 13, threshold: "后 20% 分位", active: true, note: "长期趋势已破坏" },
+      { name: "收盘 < 50 日均线", type: "趋势", reading: "低于 50DMA −6.01%", percentile: 4, threshold: "后 20% 分位", active: true, note: "短期趋势走弱" },
+      { name: "RSI(14) 后 20%", type: "动量", reading: "RSI 31.6", percentile: 2, threshold: "后 20% 分位", active: true, note: "动量偏弱" },
       { name: "周收盘 < 30 周均线", type: "周线", reading: "高于 30WMA +0.29%", percentile: 22, threshold: "后 20% 分位", active: false, note: "周线趋势完好" },
-      { name: "ATR 前 20%", type: "波动率", reading: "ATR 97% 分位", percentile: 97, threshold: "前 20% 分位", active: true, note: "波动率处于高位" },
-      { name: "VIX 前 20%", type: "波动率", reading: "VIX 24.6（84% 分位）", percentile: 84, threshold: "前 20% 分位", active: true, note: "VIX 进入高位" },
-      { name: "MACD 柱后 20%", type: "动量", reading: "MACD 柱 −0.29%/价格", percentile: 15, threshold: "后 20% 分位", active: true, note: "动量转弱" }
+      { name: "ATR 前 20%", type: "波动率", reading: "ATR 100% 分位", percentile: 100, threshold: "前 20% 分位", active: true, note: "波动率处于高位" },
+      { name: "VIX 前 20%", type: "波动率", reading: "VIX 28.4（92% 分位）", percentile: 92, threshold: "前 20% 分位", active: true, note: "VIX 进入高位" },
+      { name: "MACD 柱后 20%", type: "动量", reading: "MACD 柱 −0.45%/价格", percentile: 8, threshold: "后 20% 分位", active: true, note: "动量转弱" }
     ]
   },
 
   auxiliary: {
-    score: 27.6,
+    score: 28.5,
     band: "观察",
     tone: "mid",
-    pct: 51.2,
-    note: "辅助分 27.6（观察），主要贡献来自估值 99.6 分位（14.9/15），信用/宽度/宏观都未亮。与主层 6/7 警告出现分歧：技术层先恶化，基本面层尚未确认。",
+    pct: 57.4,
+    note: "辅助分 28.5（观察），主要贡献来自估值 99.6 分位（14.9/15），信用/宽度/利率/宏观都未亮。与主层 6/7 警告出现分歧：技术层先恶化，基本面层尚未确认。",
     signals: [
-      { name: "信用", value: 16.7, weight: 25, contribution: 4.2, note: "信用压力低" },
+      { name: "信用", value: 18.3, weight: 25, contribution: 4.6, note: "信用压力低" },
       { name: "宽度", value: 0.0, weight: 20, contribution: 0.0, note: "等权/市值权未恶化" },
       { name: "估值", value: 99.6, weight: 15, contribution: 14.9, note: "CAPE 极高，主要贡献" },
-      { name: "波动率", value: 47.3, weight: 15, contribution: 7.1, note: "VIX/期限结构中位" },
-      { name: "利率", value: 26.5, weight: 10, contribution: 2.6, note: "利率压力中等" },
+      { name: "波动率", value: 57.0, weight: 15, contribution: 8.6, note: "波动率偏高" },
+      { name: "利率", value: 24.0, weight: 10, contribution: 2.4, note: "实际利率/曲线温和" },
       { name: "宏观", value: 0.0, weight: 15, contribution: 0.0, note: "失业率未触发" },
       { name: "杠杆/流动性", value: null, weight: null, contribution: null, note: "未建模（NFCI 免费历史不足）" },
       { name: "情绪/资金", value: null, weight: null, contribution: null, note: "未建模（无可靠免费历史）" },
