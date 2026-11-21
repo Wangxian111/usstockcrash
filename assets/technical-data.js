@@ -1,8 +1,8 @@
 const TECHNICAL_DATA = {
   "meta": {
-    "generatedAt": "2026-11-20 06:33",
+    "generatedAt": "2026-11-21 06:23",
     "windowStart": "2017-11-01",
-    "windowEnd": "2026-05-22",
+    "windowEnd": "2026-05-26",
     "horizonDays": 126,
     "drawdownThreshold": -0.1,
     "baseRate": 23.4,
@@ -25,7 +25,7 @@ const TECHNICAL_DATA = {
       "signalDays": 39,
       "triggers": 28,
       "precision": 33.3,
-      "lift": 1.46,
+      "lift": 1.47,
       "recall": 2.3,
       "fpr": 1.4,
       "avgFwdDd": -7.6,
@@ -75,7 +75,7 @@ const TECHNICAL_DATA = {
       "precision": 25.9,
       "lift": 1.14,
       "recall": 2.7,
-      "fpr": 2.4,
+      "fpr": 2.3,
       "avgFwdDd": -7.4,
       "medianFwdDd": -4.0
     },
@@ -118,9 +118,9 @@ const TECHNICAL_DATA = {
     {
       "name": "MACD 线 < 信号线",
       "kind": "动量",
-      "signalDays": 713,
+      "signalDays": 714,
       "triggers": 100,
-      "precision": 23.3,
+      "precision": 23.2,
       "lift": 1.02,
       "recall": 29.7,
       "fpr": 29.9,
@@ -142,12 +142,12 @@ const TECHNICAL_DATA = {
     {
       "name": "周 RSI(14) > 70（超买）",
       "kind": "周线",
-      "signalDays": 274,
+      "signalDays": 275,
       "triggers": 15,
-      "precision": 19.7,
-      "lift": 0.87,
+      "precision": 19.6,
+      "lift": 0.86,
       "recall": 9.7,
-      "fpr": 12.0,
+      "fpr": 12.1,
       "avgFwdDd": -7.9,
       "medianFwdDd": -3.8
     },
@@ -166,9 +166,9 @@ const TECHNICAL_DATA = {
     {
       "name": "RSI(14) > 70（超买）",
       "kind": "超买",
-      "signalDays": 219,
-      "triggers": 62,
-      "precision": 17.4,
+      "signalDays": 220,
+      "triggers": 63,
+      "precision": 17.3,
       "lift": 0.76,
       "recall": 6.8,
       "fpr": 9.9,
@@ -300,7 +300,7 @@ const TECHNICAL_DATA = {
     {
       "name": "MACD 线 < 信号线",
       "kind": "动量",
-      "signalDays": 1133,
+      "signalDays": 1134,
       "triggers": 107,
       "precision": 25.4,
       "lift": 1.09,
@@ -348,12 +348,12 @@ const TECHNICAL_DATA = {
     {
       "name": "周 RSI(14) > 70（超买）",
       "kind": "周线",
-      "signalDays": 276,
+      "signalDays": 277,
       "triggers": 15,
-      "precision": 19.6,
-      "lift": 0.84,
+      "precision": 19.5,
+      "lift": 0.83,
       "recall": 9.7,
-      "fpr": 12.1,
+      "fpr": 12.2,
       "avgFwdDd": -7.9,
       "medianFwdDd": -3.8
     },
@@ -372,9 +372,9 @@ const TECHNICAL_DATA = {
     {
       "name": "RSI(14) > 70（超买）",
       "kind": "超买",
-      "signalDays": 234,
-      "triggers": 65,
-      "precision": 17.5,
+      "signalDays": 235,
+      "triggers": 66,
+      "precision": 17.4,
       "lift": 0.75,
       "recall": 7.3,
       "fpr": 10.6,
@@ -406,30 +406,30 @@ const TECHNICAL_DATA = {
       "medianFwdDd": -3.5
     }
   ],
-  "nearHighBaseRate": 22.8,
+  "nearHighBaseRate": 22.7,
   "models": {
     "fundamental": {
       "top20": {
-        "n": 780,
-        "alerts": 157,
+        "n": 781,
+        "alerts": 158,
         "hits": 19,
-        "alertRate": 20.1,
-        "precision": 12.1,
+        "alertRate": 20.2,
+        "precision": 12.0,
         "precisionCI": [
-          7.9,
-          18.1
+          7.8,
+          18.0
         ],
         "recall": 12.8,
-        "fpr": 21.9,
+        "fpr": 22.0,
         "auc": 0.354,
         "baseRate": 19.1,
         "lift": 0.63
       },
       "top10": {
-        "n": 780,
+        "n": 781,
         "alerts": 80,
         "hits": 8,
-        "alertRate": 10.3,
+        "alertRate": 10.2,
         "precision": 10.0,
         "precisionCI": [
           5.2,
@@ -444,26 +444,26 @@ const TECHNICAL_DATA = {
     },
     "technical": {
       "top20": {
-        "n": 760,
-        "alerts": 153,
+        "n": 761,
+        "alerts": 154,
         "hits": 47,
-        "alertRate": 20.1,
-        "precision": 30.7,
+        "alertRate": 20.2,
+        "precision": 30.5,
         "precisionCI": [
-          24.0,
-          38.4
+          23.8,
+          38.2
         ],
         "recall": 31.5,
-        "fpr": 17.3,
-        "auc": 0.527,
+        "fpr": 17.5,
+        "auc": 0.528,
         "baseRate": 19.6,
-        "lift": 1.57
+        "lift": 1.56
       },
       "top10": {
-        "n": 760,
+        "n": 761,
         "alerts": 78,
         "hits": 32,
-        "alertRate": 10.3,
+        "alertRate": 10.2,
         "precision": 41.0,
         "precisionCI": [
           30.8,
@@ -471,33 +471,33 @@ const TECHNICAL_DATA = {
         ],
         "recall": 21.5,
         "fpr": 7.5,
-        "auc": 0.527,
+        "auc": 0.528,
         "baseRate": 19.6,
-        "lift": 2.09
+        "lift": 2.1
       }
     },
     "combined": {
       "top20": {
-        "n": 760,
-        "alerts": 153,
+        "n": 761,
+        "alerts": 154,
         "hits": 40,
-        "alertRate": 20.1,
-        "precision": 26.1,
+        "alertRate": 20.2,
+        "precision": 26.0,
         "precisionCI": [
-          19.8,
-          33.6
+          19.7,
+          33.4
         ],
         "recall": 26.8,
-        "fpr": 18.5,
-        "auc": 0.476,
+        "fpr": 18.6,
+        "auc": 0.477,
         "baseRate": 19.6,
         "lift": 1.33
       },
       "top10": {
-        "n": 760,
+        "n": 761,
         "alerts": 78,
         "hits": 20,
-        "alertRate": 10.3,
+        "alertRate": 10.2,
         "precision": 25.6,
         "precisionCI": [
           17.3,
@@ -505,7 +505,7 @@ const TECHNICAL_DATA = {
         ],
         "recall": 13.4,
         "fpr": 9.5,
-        "auc": 0.476,
+        "auc": 0.477,
         "baseRate": 19.6,
         "lift": 1.31
       }
@@ -513,7 +513,7 @@ const TECHNICAL_DATA = {
   },
   "rules": {
     "fund_score >= 45": {
-      "n": 958,
+      "n": 959,
       "alerts": 10,
       "hits": 0,
       "alertRate": 1.0,
@@ -529,7 +529,7 @@ const TECHNICAL_DATA = {
       "lift": 0.0
     },
     "fund_pct >= 80": {
-      "n": 958,
+      "n": 959,
       "alerts": 185,
       "hits": 38,
       "alertRate": 19.3,
@@ -545,18 +545,18 @@ const TECHNICAL_DATA = {
       "lift": 0.96
     },
     "RSI(14) > 70": {
-      "n": 958,
-      "alerts": 113,
+      "n": 959,
+      "alerts": 114,
       "hits": 18,
-      "alertRate": 11.8,
-      "precision": 15.9,
+      "alertRate": 11.9,
+      "precision": 15.8,
       "precisionCI": [
-        10.3,
-        23.8
+        10.2,
+        23.6
       ],
       "recall": 8.8,
-      "fpr": 12.6,
-      "auc": 0.481,
+      "fpr": 12.7,
+      "auc": 0.48,
       "baseRate": 21.4,
       "lift": 0.74
     }
@@ -698,27 +698,27 @@ const TECHNICAL_DATA = {
     },
     {
       "year": 2026,
-      "testDays": 85,
+      "testDays": 86,
       "baseRate": 0.0,
       "skipped": false,
       "fundamental_precision20": 0.0,
       "fundamental_recall20": null,
       "fundamental_auc": null,
-      "fundamental_alerts20": 17,
+      "fundamental_alerts20": 18,
       "fundamental_precision10": 0.0,
       "fundamental_recall10": null,
       "fundamental_alerts10": 9,
       "technical_precision20": 0.0,
       "technical_recall20": null,
       "technical_auc": null,
-      "technical_alerts20": 13,
+      "technical_alerts20": 14,
       "technical_precision10": 0.0,
       "technical_recall10": null,
       "technical_alerts10": 7,
       "combined_precision20": 0.0,
       "combined_recall20": null,
       "combined_auc": null,
-      "combined_alerts20": 13,
+      "combined_alerts20": 14,
       "combined_precision10": 0.0,
       "combined_recall10": null,
       "combined_alerts10": 7,
@@ -3611,9 +3611,9 @@ const TECHNICAL_DATA = {
     },
     {
       "d": "2026-11-20",
-      "close": 715.87,
-      "sma200": 732.7,
-      "dd": -8.1
+      "close": 689.81,
+      "sma200": 732.76,
+      "dd": -11.5
     }
   ]
 };

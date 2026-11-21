@@ -1,10 +1,10 @@
 const BACKTEST_DATA = {
   "meta": {
-    "generatedAt": "2026-11-20 06:32",
+    "generatedAt": "2026-11-21 06:23",
     "windowStart": "2017-05-23",
-    "windowEnd": "2026-11-19",
+    "windowEnd": "2026-11-20",
     "priceStart": "2016-11-21",
-    "priceEnd": "2026-11-19",
+    "priceEnd": "2026-11-20",
     "weights": {
       "credit": 25,
       "breadth": 20,
@@ -24,14 +24,14 @@ const BACKTEST_DATA = {
   },
   "summary": {
     "episodeCount": 9,
-    "majorCount": 5,
-    "sharpCount": 4,
+    "majorCount": 6,
+    "sharpCount": 3,
     "early": 1,
     "partial": 2,
-    "coincident": 1,
+    "coincident": 2,
     "missed": 1,
     "falsePositiveCount": 1,
-    "medianPreMax": 38.7
+    "medianPreMax": 39.0
   },
   "series": [
     {
@@ -2016,7 +2016,7 @@ const BACKTEST_DATA = {
     },
     {
       "d": "2026-11-20",
-      "v": 28.5
+      "v": 30.2
     }
   ],
   "seriesPct": [
@@ -3902,7 +3902,7 @@ const BACKTEST_DATA = {
     },
     {
       "d": "2026-11-20",
-      "v": 57.4
+      "v": 68.5
     }
   ],
   "episodes": [
@@ -4108,17 +4108,17 @@ const BACKTEST_DATA = {
     },
     {
       "peak": "2026-10-06",
-      "trough": "2026-11-19",
+      "trough": "2026-11-20",
       "recovery": null,
-      "drawdown": -8.1,
-      "major": false,
+      "drawdown": -11.5,
+      "major": true,
       "score_t90": 34.2,
       "score_t60": 22.7,
       "score_t30": 18.2,
       "score_t10": 28.7,
       "pre_max_90": 39.3,
       "pre_max_30": 39.3,
-      "score_trough": 28.5,
+      "score_trough": 30.2,
       "post_max_10": 39.3,
       "lead60_days": null,
       "lead65_days": null,
@@ -4127,9 +4127,9 @@ const BACKTEST_DATA = {
       "pct_t30": 0.0,
       "pct_t10": 56.0,
       "pct_pre_max": 90.0,
-      "pct_trough": 57.0,
+      "pct_trough": 69.0,
       "pct_post_max_10": 90.0,
-      "label": "Minor drawdown"
+      "label": "Coincident confirmation"
     }
   ],
   "signalRows": [
@@ -4340,7 +4340,7 @@ const BACKTEST_DATA = {
           "end": "2026-10-15",
           "max_pct": 90.0,
           "dd_at_start": -1.6,
-          "forward_6m_dd": -6.5,
+          "forward_6m_dd": -9.9,
           "outcome": "false"
         }
       ]
@@ -4450,7 +4450,7 @@ const BACKTEST_DATA = {
           "end": "2026-10-12",
           "max_pct": 90.0,
           "dd_at_start": -1.8,
-          "forward_6m_dd": -6.3,
+          "forward_6m_dd": -9.7,
           "outcome": "false"
         }
       ]
@@ -4566,10 +4566,10 @@ const BACKTEST_DATA = {
       "horizonDays": 126,
       "episodes": 11,
       "preCrisis": 10,
-      "hits": 4,
-      "falsePositives": 6,
+      "hits": 5,
+      "falsePositives": 5,
       "postCrisis": 1,
-      "falsePositiveRate": 60.0,
+      "falsePositiveRate": 50.0,
       "rows": [
         {
           "start": "2018-01-30",
@@ -4656,8 +4656,8 @@ const BACKTEST_DATA = {
           "end": "2026-10-15",
           "max_pct": 90.0,
           "dd_at_start": -1.6,
-          "forward_6m_dd": -6.5,
-          "outcome": "false"
+          "forward_6m_dd": -9.9,
+          "outcome": "hit"
         }
       ]
     },
@@ -4668,10 +4668,10 @@ const BACKTEST_DATA = {
       "horizonDays": 126,
       "episodes": 12,
       "preCrisis": 9,
-      "hits": 4,
-      "falsePositives": 5,
+      "hits": 5,
+      "falsePositives": 4,
       "postCrisis": 3,
-      "falsePositiveRate": 56.0,
+      "falsePositiveRate": 44.0,
       "rows": [
         {
           "start": "2018-01-31",
@@ -4766,8 +4766,8 @@ const BACKTEST_DATA = {
           "end": "2026-10-12",
           "max_pct": 90.0,
           "dd_at_start": -1.8,
-          "forward_6m_dd": -6.3,
-          "outcome": "false"
+          "forward_6m_dd": -9.7,
+          "outcome": "hit"
         }
       ]
     },
