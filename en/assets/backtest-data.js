@@ -1,6 +1,6 @@
 const BACKTEST_DATA = {
   "meta": {
-    "generatedAt": "2026-11-21 06:23",
+    "generatedAt": "2026-11-22 05:54",
     "windowStart": "2017-05-23",
     "windowEnd": "2026-11-20",
     "priceStart": "2016-11-21",
