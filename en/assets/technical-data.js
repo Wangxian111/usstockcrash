@@ -1,8 +1,8 @@
 const TECHNICAL_DATA = {
   "meta": {
-    "generatedAt": "2026-11-23 06:44",
+    "generatedAt": "2026-11-24 09:12",
     "windowStart": "2017-11-01",
-    "windowEnd": "2026-05-26",
+    "windowEnd": "2026-05-27",
     "horizonDays": 126,
     "drawdownThreshold": -0.1,
     "baseRate": 23.4,
@@ -25,7 +25,7 @@ const TECHNICAL_DATA = {
       "signalDays": 39,
       "triggers": 28,
       "precision": 33.3,
-      "lift": 1.47,
+      "lift": 1.46,
       "recall": 2.3,
       "fpr": 1.4,
       "avgFwdDd": -7.6,
@@ -75,7 +75,7 @@ const TECHNICAL_DATA = {
       "precision": 25.9,
       "lift": 1.14,
       "recall": 2.7,
-      "fpr": 2.3,
+      "fpr": 2.4,
       "avgFwdDd": -7.4,
       "medianFwdDd": -4.0
     },
@@ -118,14 +118,14 @@ const TECHNICAL_DATA = {
     {
       "name": "MACD line < signal line",
       "kind": "Momentum",
-      "signalDays": 714,
-      "triggers": 100,
-      "precision": 23.2,
+      "signalDays": 712,
+      "triggers": 101,
+      "precision": 23.3,
       "lift": 1.02,
       "recall": 29.7,
       "fpr": 29.9,
-      "avgFwdDd": -6.5,
-      "medianFwdDd": -3.3
+      "avgFwdDd": -6.6,
+      "medianFwdDd": -3.4
     },
     {
       "name": "Bollinger width < 20th percentile (squeeze)",
@@ -142,7 +142,7 @@ const TECHNICAL_DATA = {
     {
       "name": "Weekly RSI(14) > 70 (overbought)",
       "kind": "Weekly",
-      "signalDays": 275,
+      "signalDays": 276,
       "triggers": 15,
       "precision": 19.6,
       "lift": 0.86,
@@ -166,13 +166,13 @@ const TECHNICAL_DATA = {
     {
       "name": "RSI(14) > 70 (overbought)",
       "kind": "Overbought",
-      "signalDays": 220,
+      "signalDays": 224,
       "triggers": 63,
-      "precision": 17.3,
-      "lift": 0.76,
+      "precision": 17.0,
+      "lift": 0.75,
       "recall": 6.8,
-      "fpr": 9.9,
-      "avgFwdDd": -6.9,
+      "fpr": 10.2,
+      "avgFwdDd": -6.8,
       "medianFwdDd": -2.4
     },
     {
@@ -300,12 +300,12 @@ const TECHNICAL_DATA = {
     {
       "name": "MACD line < signal line",
       "kind": "Momentum",
-      "signalDays": 1134,
-      "triggers": 107,
+      "signalDays": 1132,
+      "triggers": 108,
       "precision": 25.4,
       "lift": 1.09,
       "recall": 51.5,
-      "fpr": 46.2,
+      "fpr": 46.1,
       "avgFwdDd": -6.5,
       "medianFwdDd": -3.8
     },
@@ -348,14 +348,14 @@ const TECHNICAL_DATA = {
     {
       "name": "Weekly RSI(14) > 70 (overbought)",
       "kind": "Weekly",
-      "signalDays": 277,
+      "signalDays": 278,
       "triggers": 15,
-      "precision": 19.5,
+      "precision": 19.4,
       "lift": 0.83,
       "recall": 9.7,
       "fpr": 12.2,
       "avgFwdDd": -7.9,
-      "medianFwdDd": -3.8
+      "medianFwdDd": -3.9
     },
     {
       "name": "Outside-down day (daily)",
@@ -372,13 +372,13 @@ const TECHNICAL_DATA = {
     {
       "name": "RSI(14) > 70 (overbought)",
       "kind": "Overbought",
-      "signalDays": 235,
+      "signalDays": 239,
       "triggers": 66,
-      "precision": 17.4,
-      "lift": 0.75,
+      "precision": 17.2,
+      "lift": 0.73,
       "recall": 7.3,
-      "fpr": 10.6,
-      "avgFwdDd": -6.9,
+      "fpr": 10.8,
+      "avgFwdDd": -6.8,
       "medianFwdDd": -2.5
     },
     {
@@ -406,27 +406,27 @@ const TECHNICAL_DATA = {
       "medianFwdDd": -3.5
     }
   ],
-  "nearHighBaseRate": 22.7,
+  "nearHighBaseRate": 22.8,
   "models": {
     "fundamental": {
       "top20": {
-        "n": 781,
+        "n": 782,
         "alerts": 158,
-        "hits": 19,
+        "hits": 18,
         "alertRate": 20.2,
-        "precision": 12.0,
+        "precision": 11.4,
         "precisionCI": [
-          7.8,
-          18.0
+          7.3,
+          17.3
         ],
-        "recall": 12.8,
-        "fpr": 22.0,
-        "auc": 0.354,
+        "recall": 12.1,
+        "fpr": 22.1,
+        "auc": 0.358,
         "baseRate": 19.1,
-        "lift": 0.63
+        "lift": 0.6
       },
       "top10": {
-        "n": 781,
+        "n": 782,
         "alerts": 80,
         "hits": 8,
         "alertRate": 10.2,
@@ -437,30 +437,30 @@ const TECHNICAL_DATA = {
         ],
         "recall": 5.4,
         "fpr": 11.4,
-        "auc": 0.354,
+        "auc": 0.358,
         "baseRate": 19.1,
         "lift": 0.52
       }
     },
     "technical": {
       "top20": {
-        "n": 761,
+        "n": 762,
         "alerts": 154,
-        "hits": 47,
+        "hits": 48,
         "alertRate": 20.2,
-        "precision": 30.5,
+        "precision": 31.2,
         "precisionCI": [
-          23.8,
-          38.2
+          24.4,
+          38.9
         ],
-        "recall": 31.5,
-        "fpr": 17.5,
+        "recall": 32.2,
+        "fpr": 17.3,
         "auc": 0.528,
         "baseRate": 19.6,
-        "lift": 1.56
+        "lift": 1.59
       },
       "top10": {
-        "n": 761,
+        "n": 762,
         "alerts": 78,
         "hits": 32,
         "alertRate": 10.2,
@@ -478,7 +478,7 @@ const TECHNICAL_DATA = {
     },
     "combined": {
       "top20": {
-        "n": 761,
+        "n": 762,
         "alerts": 154,
         "hits": 40,
         "alertRate": 20.2,
@@ -489,31 +489,31 @@ const TECHNICAL_DATA = {
         ],
         "recall": 26.8,
         "fpr": 18.6,
-        "auc": 0.477,
+        "auc": 0.475,
         "baseRate": 19.6,
         "lift": 1.33
       },
       "top10": {
-        "n": 761,
+        "n": 762,
         "alerts": 78,
-        "hits": 20,
+        "hits": 18,
         "alertRate": 10.2,
-        "precision": 25.6,
+        "precision": 23.1,
         "precisionCI": [
-          17.3,
-          36.3
+          15.1,
+          33.6
         ],
-        "recall": 13.4,
-        "fpr": 9.5,
-        "auc": 0.477,
+        "recall": 12.1,
+        "fpr": 9.8,
+        "auc": 0.475,
         "baseRate": 19.6,
-        "lift": 1.31
+        "lift": 1.18
       }
     }
   },
   "rules": {
     "fund_score >= 45": {
-      "n": 959,
+      "n": 960,
       "alerts": 10,
       "hits": 0,
       "alertRate": 1.0,
@@ -529,7 +529,7 @@ const TECHNICAL_DATA = {
       "lift": 0.0
     },
     "fund_pct >= 80": {
-      "n": 959,
+      "n": 960,
       "alerts": 185,
       "hits": 38,
       "alertRate": 19.3,
@@ -545,27 +545,27 @@ const TECHNICAL_DATA = {
       "lift": 0.96
     },
     "RSI(14) > 70": {
-      "n": 959,
-      "alerts": 114,
+      "n": 960,
+      "alerts": 115,
       "hits": 18,
-      "alertRate": 11.9,
-      "precision": 15.8,
+      "alertRate": 12.0,
+      "precision": 15.7,
       "precisionCI": [
-        10.2,
-        23.6
+        10.1,
+        23.4
       ],
       "recall": 8.8,
-      "fpr": 12.7,
+      "fpr": 12.8,
       "auc": 0.48,
       "baseRate": 21.4,
-      "lift": 0.74
+      "lift": 0.73
     }
   },
   "stability": {
     "years": 4,
     "minPrecision": 0.0,
     "maxPrecision": 65.9,
-    "medianPrecision": 20.4,
+    "medianPrecision": 21.4,
     "yearsAboveBase": 2
   },
   "bestIndicator": {
@@ -639,23 +639,23 @@ const TECHNICAL_DATA = {
       "testDays": 244,
       "baseRate": 25.8,
       "skipped": false,
-      "fundamental_precision20": 16.3,
-      "fundamental_recall20": 12.7,
-      "fundamental_auc": 0.19,
+      "fundamental_precision20": 14.3,
+      "fundamental_recall20": 11.1,
+      "fundamental_auc": 0.188,
       "fundamental_alerts20": 49,
       "fundamental_precision10": 0.0,
       "fundamental_recall10": 0.0,
       "fundamental_alerts10": 25,
-      "technical_precision20": 40.8,
-      "technical_recall20": 31.7,
-      "technical_auc": 0.704,
+      "technical_precision20": 42.9,
+      "technical_recall20": 33.3,
+      "technical_auc": 0.705,
       "technical_alerts20": 49,
       "technical_precision10": 48.0,
       "technical_recall10": 19.0,
       "technical_alerts10": 25,
       "combined_precision20": 20.4,
       "combined_recall20": 15.9,
-      "combined_auc": 0.552,
+      "combined_auc": 0.548,
       "combined_alerts20": 49,
       "combined_precision10": 12.0,
       "combined_recall10": 4.8,
@@ -672,24 +672,24 @@ const TECHNICAL_DATA = {
       "skipped": false,
       "fundamental_precision20": 26.8,
       "fundamental_recall20": 26.8,
-      "fundamental_auc": 0.523,
+      "fundamental_auc": 0.527,
       "fundamental_alerts20": 41,
       "fundamental_precision10": 38.1,
       "fundamental_recall10": 19.5,
       "fundamental_alerts10": 21,
       "technical_precision20": 65.9,
       "technical_recall20": 65.9,
-      "technical_auc": 0.93,
+      "technical_auc": 0.929,
       "technical_alerts20": 41,
       "technical_precision10": 95.2,
       "technical_recall10": 48.8,
       "technical_alerts10": 21,
       "combined_precision20": 73.2,
       "combined_recall20": 73.2,
-      "combined_auc": 0.95,
+      "combined_auc": 0.946,
       "combined_alerts20": 41,
-      "combined_precision10": 81.0,
-      "combined_recall10": 41.5,
+      "combined_precision10": 71.4,
+      "combined_recall10": 36.6,
       "combined_alerts10": 21,
       "rule45_precision": 0.0,
       "rule45_alerts": 7,
@@ -698,7 +698,7 @@ const TECHNICAL_DATA = {
     },
     {
       "year": 2026,
-      "testDays": 86,
+      "testDays": 87,
       "baseRate": 0.0,
       "skipped": false,
       "fundamental_precision20": 0.0,
@@ -729,12 +729,6 @@ const TECHNICAL_DATA = {
     }
   ],
   "series": [
-    {
-      "d": "2017-09-08",
-      "close": 246.58,
-      "sma200": 236.65,
-      "dd": -0.5
-    },
     {
       "d": "2017-09-15",
       "close": 249.19,
@@ -3614,6 +3608,12 @@ const TECHNICAL_DATA = {
       "close": 689.81,
       "sma200": 732.76,
       "dd": -11.5
+    },
+    {
+      "d": "2026-11-27",
+      "close": 722.29,
+      "sma200": 732.92,
+      "dd": -7.3
     }
   ]
 };
