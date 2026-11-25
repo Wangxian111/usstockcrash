@@ -1,13 +1,13 @@
 /* ==========================================================================
    美股暴跌预警 · 三层趋势雷达（首页）
    主层：7 条件三层跟踪；辅助：6 信号基本面风险分。
-   数据为 2026-11-23 快照，非实时行情。
+   数据为 2026-11-24 快照，非实时行情。
    ========================================================================== */
 
 "use strict";
 
 const PAGE_DATA = {
-  asOf: "2026-11-23",
+  asOf: "2026-11-24",
 
   layer: {
     score: 7,
@@ -15,41 +15,41 @@ const PAGE_DATA = {
     tier: "警告层",
     tone: "warn",
     confirmed: false,
-    volumeRatio: 1.44,
+    volumeRatio: 1.02,
     volumeThreshold: 1.5,
-    summary: "7/7 条件全部触发；放量 1.44× 低于 1.5×，确认层未成立。",
+    summary: "7/7 条件全部触发；放量 1.02× 低于 1.5×，确认层未成立。",
     tags: [
       { text: "200DMA 下方", tone: "warn" },
       { text: "50DMA 下方", tone: "warn" },
       { text: "周线 30WMA 下方", tone: "warn" },
       { text: "ATR 100% 分位", tone: "warn" },
       { text: "MACD 走弱", tone: "warn" },
-      { text: "RSI 41.5", tone: "mid" },
+      { text: "RSI 40.5", tone: "mid" },
       { text: "VIX 高位", tone: "warn" }
     ],
     conditions: [
-      { name: "收盘 < 200 日均线", type: "趋势", reading: "低于 200DMA −1.5%", percentile: 15, threshold: "后 20% 分位", active: true, note: "长期趋势已破坏" },
-      { name: "收盘 < 50 日均线", type: "趋势", reading: "低于 50DMA −4.89%", percentile: 6, threshold: "后 20% 分位", active: true, note: "短期趋势走弱" },
-      { name: "RSI(14) 后 20%", type: "动量", reading: "RSI 41.5", percentile: 12, threshold: "后 20% 分位", active: true, note: "动量偏弱" },
+      { name: "收盘 < 200 日均线", type: "趋势", reading: "低于 200DMA −1.9%", percentile: 14, threshold: "后 20% 分位", active: true, note: "长期趋势已破坏" },
+      { name: "收盘 < 50 日均线", type: "趋势", reading: "低于 50DMA −5.25%", percentile: 5, threshold: "后 20% 分位", active: true, note: "短期趋势走弱" },
+      { name: "RSI(14) 后 20%", type: "动量", reading: "RSI 40.5", percentile: 11, threshold: "后 20% 分位", active: true, note: "动量偏弱" },
       { name: "周收盘 < 30 周均线", type: "周线", reading: "低于 30WMA −8.20%", percentile: 5, threshold: "后 20% 分位", active: true, note: "周线趋势走弱" },
       { name: "ATR 前 20%", type: "波动率", reading: "ATR 100% 分位", percentile: 100, threshold: "前 20% 分位", active: true, note: "波动率处于高位" },
-      { name: "VIX 前 20%", type: "波动率", reading: "VIX 26.6（89% 分位）", percentile: 89, threshold: "前 20% 分位", active: true, note: "VIX 进入高位" },
-      { name: "MACD 柱后 20%", type: "动量", reading: "MACD 柱 −0.59%/价格", percentile: 5, threshold: "后 20% 分位", active: true, note: "动量转弱" }
+      { name: "VIX 前 20%", type: "波动率", reading: "VIX 26.4（88% 分位）", percentile: 88, threshold: "前 20% 分位", active: true, note: "VIX 进入高位" },
+      { name: "MACD 柱后 20%", type: "动量", reading: "MACD 柱 −0.49%/价格", percentile: 7, threshold: "后 20% 分位", active: true, note: "动量转弱" }
     ]
   },
 
   auxiliary: {
-    score: 30.9,
+    score: 31.4,
     band: "观察",
     tone: "mid",
-    pct: 70.8,
-    note: "辅助分 30.9（观察），主要贡献来自估值 99.6 分位（14.9/15），信用/宽度/利率/宏观都未亮。与主层 7/7 警告出现分歧：技术层先恶化，基本面层尚未确认。",
+    pct: 72.4,
+    note: "辅助分 31.4（观察），主要贡献来自估值 99.6 分位（14.9/15），信用/宽度/利率/宏观都未亮。与主层 7/7 警告出现分歧：技术层先恶化，基本面层尚未确认。",
     signals: [
-      { name: "信用", value: 23.8, weight: 25, contribution: 6.0, note: "信用压力低" },
+      { name: "信用", value: 24.1, weight: 25, contribution: 6.0, note: "信用压力低" },
       { name: "宽度", value: 0.0, weight: 20, contribution: 0.0, note: "等权/市值权未恶化" },
       { name: "估值", value: 99.6, weight: 15, contribution: 14.9, note: "CAPE 极高，主要贡献" },
-      { name: "波动率", value: 54.5, weight: 15, contribution: 8.2, note: "VIX/期限结构中位" },
-      { name: "利率", value: 23.5, weight: 10, contribution: 2.4, note: "实际利率/曲线温和" },
+      { name: "波动率", value: 52.7, weight: 15, contribution: 7.9, note: "VIX/期限结构中位" },
+      { name: "利率", value: 22.5, weight: 10, contribution: 2.2, note: "实际利率/曲线温和" },
       { name: "宏观", value: 0.0, weight: 15, contribution: 0.0, note: "失业率未触发" },
       { name: "杠杆/流动性", value: null, weight: null, contribution: null, note: "未建模（NFCI 免费历史不足）" },
       { name: "情绪/资金", value: null, weight: null, contribution: null, note: "未建模（无可靠免费历史）" },
