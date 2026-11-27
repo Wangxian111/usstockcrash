@@ -1,6 +1,6 @@
 const TECHNICAL_DATA = {
   "meta": {
-    "generatedAt": "2026-11-26 07:39",
+    "generatedAt": "2026-11-27 07:37",
     "windowStart": "2017-11-01",
     "windowEnd": "2026-05-29",
     "horizonDays": 126,
